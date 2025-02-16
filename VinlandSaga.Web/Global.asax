@@ -1,0 +1,1 @@
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="VinlandSaga.Web.MvcApplication" Language="C#" %>

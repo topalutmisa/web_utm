@@ -1,0 +1,29 @@
+﻿
+<!-- Навигация -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" @Html.ActionLink("Главная", "Index", "VinlandSaga", null, new { @class = "nav-link" })>
+            <img src="~/Content/images/story-icon.jpg" alt="Vinland Saga" class="nav-logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">@Html.ActionLink("Главная", "Index", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Сюжет", "Story", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Персонажи", "Characters", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Галерея", "Gallery", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Медиа", "Media", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Форум", "Forum", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Фан-арт", "Fanart", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Контакты", "Contact", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Profile", "VinlandSaga")">
+                        <i class="fas fa-user me-2"></i>Профиль
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,52 @@
+﻿<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        const filterButtons = document.querySelectorAll('.btn-filter');
+        const fanartItems = document.querySelectorAll('[data-category]');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const filterValue = button.getAttribute('data-filter');
+                
+                
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                
+                fanartItems.forEach(item => {
+                    if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        
+        const artModal = document.getElementById('artModal');
+        const modalImage = document.getElementById('modalArtImage');
+        const modalTitle = document.getElementById('modalArtTitle');
+        const modalArtistName = document.getElementById('modalArtistName');
+        const modalArtistAvatar = document.getElementById('modalArtistAvatar');
+        const modalDescription = document.getElementById('modalArtDescription');
+        
+        const viewButtons = document.querySelectorAll('.btn-view');
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const imgSrc = button.getAttribute('data-img');
+                const title = button.getAttribute('data-title');
+                const artist = button.getAttribute('data-artist');
+                const description = button.getAttribute('data-description');
+                const avatarSrc = button.closest('.fanart-card').querySelector('.avatar').src;
+                
+                modalImage.src = imgSrc;
+                modalTitle.textContent = title;
+                modalArtistName.textContent = artist;
+                modalArtistAvatar.src = avatarSrc;
+                modalDescription.textContent = description;
+            });
+        });
+    });
+</script> 
