@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "Главная";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<header class="hero-section">
+    <div class="container text-center position-relative">
+        <h1 class="hero-title mb-4">VINLAND<br>SAGA</h1>
+        <p class="lead text-muted">Путь к истинному воинству начинается здесь</p>
+    </div>
+</header>
+
+<main class="container my-5">
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+            <div class="section-card" onmousemove="cardParallax(event, this)">
+                <div class="icon-box mb-4">
+                    <img src="@Url.Content("~/Content/images/icon1.webp")" alt="Иконка сюжета" class="img-fluid" style="width: 60px;">
+                </div>
+                <h3 class="h4 mb-3">Эпическое повествование</h3>
+                <p class="text-secondary">Откройте для себя глубину истории о поисках Винланда</p>
+                <a href="@Url.Action("Story", "VinlandSaga")" class="btn btn-modern mt-3">Исследовать</a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="section-card" onmousemove="cardParallax(event, this)">
+                <div class="icon-box mb-4">
+                    <img src="@Url.Content("~/Content/images/icon2.webp")" alt="Иконка персонажей" class="img-fluid" style="width: 60px;">
+                </div>
+                <h3 class="h4 mb-3">Легендарные воины</h3>
+                <p class="text-secondary">Изучите характеры и мотивации ключевых персонажей</p>
+                <a href="@Url.Action("Characters", "VinlandSaga")" class="btn btn-modern mt-3">Узнать больше</a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="section-card" onmousemove="cardParallax(event, this)">
+                <div class="icon-box mb-4">
+                    <img src="@Url.Content("~/Content/images/icon3.jpg")" alt="Иконка галереи" class="img-fluid" style="width: 60px;">
+                </div>
+                <h3 class="h4 mb-3">Визуальная вселенная</h3>
+                <p class="text-secondary">Эксклюзивные арты и концепты из мира саги</p>
+                <a href="@Url.Action("Gallery", "VinlandSaga")" class="btn btn-modern mt-3">Смотреть</a>
+            </div>
+        </div>
+    </div>
+</main> 

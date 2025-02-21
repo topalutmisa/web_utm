@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "Персонажи";
+}
+
+
+<header class="characters-header">
+    <div class="container text-center py-5">
+        <h1 class="display-3 fw-bold mb-4">Легендарные Воины</h1>
+        <p class="lead">Исследуйте глубину характеров ключевых персонажей</p>
+    </div>
+</header>
+
+
+    <main class="characters-main">
+        <section class="character-section py-5">
+            <div class="container">
+                
+                <div class="main-character row g-5 align-items-center mb-5">
+                    <div class="col-lg-6">
+                        <div class="character-photo">
+                            <img src="~/Content/images/episode2.jpg" alt="Торфинн" class="img-fluid rounded-4 character-img">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="character-info">
+                            <h2 class="character-name">Торфинн Карлсефни</h2>
+                            <div class="character-meta d-flex gap-4 my-4">
+                                <span class="badge">Главный герой</span>
+                                <span class="badge">Бывший воин</span>
+                                <span class="badge">Искатель Винланда</span>
+                            </div>
+                            <p class="character-description">
+                                От мести к искуплению - путь полный испытаний...
+                            </p>
+                            <ul class="character-stats">
+                                <li>Возраст: 25 лет</li>
+                                <li>Происхождение: Исландия</li>
+                                <li>Особые навыки: Эксперт ближнего боя</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="secondary-characters">
+                    <h3 class="section-subtitle mb-5">Ключевые фигуры саги</h3>
+
+                    <div class="row g-4">
+                        
+                        <div class="col-lg-4 col-md-6">
+                            <div class="character-card">
+                                <div class="card-image">
+                                    <img src="~/Content/images/askeladd.jpg" alt="Аскеладд" class="img-fluid">
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="card-title">Аскеладд</h4>
+                                    <p class="card-text">Харизматичный лидер наемников...</p>
+                                    <a href="#" class="btn btn-modern">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="col-lg-4 col-md-6">
+                            <div class="character-card">
+                                <div class="card-image">
+                                    <img src="~/Content/images/episode1.jpg" alt="Канут" class="img-fluid">
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="card-title">Канут Великий</h4>
+                                    <p class="card-text">Принц, ставший королем...</p>
+                                    <a href="#" class="btn btn-modern">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-6">
+                            <div class="character-card">
+                                <div class="card-image">
+                                    <img src="~/Content/images/thorkell.png" alt="Торкель" class="img-fluid">
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="card-title">Торкель Длинный</h4>
+                                    <p class="card-text">Я буду сражаться, когда захочу!</p>
+                                    <a href="#" class="btn btn-modern">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>

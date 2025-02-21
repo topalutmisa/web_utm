@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "Форум";
+}
+
+
+    <main class="forum-main py-5">
+        <div class="container">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5 fw-bold">Форум сообщества</h1>
+                <button class="btn btn-modern" data-bs-toggle="modal" data-bs-target="#newTopicModal">
+                    <i class="fas fa-plus me-2"></i>Новая тема
+                </button>
+            </div>
+
+            
+            <div class="forum-controls mb-4">
+                <div class="d-flex gap-3">
+                    <select class="form-select w-auto">
+                        <option>Все разделы</option>
+                        <option>Обсуждение манги</option>
+                        <option>Аниме</option>
+                        <option>Теории</option>
+                    </select>
+                    <div class="input-group w-50">
+                        <input type="text" class="form-control" placeholder="Поиск по темам">
+                        <button class="btn btn-modern">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="forum-list">
+                
+                <div class="forum-topic card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="topic-title">
+                                    <a href="topic.html" class="text-decoration-none">Кто ваш любимый персонаж?</a>
+                                </h3>
+                                <div class="topic-meta text-muted small">
+                                    <span class="me-3">
+                                        <i class="fas fa-user me-1"></i>Олег Иванов
+                                    </span>
+                                    <span class="me-3">
+                                        <i class="fas fa-clock me-1"></i>2 часа назад
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-comments me-1"></i>15 ответов
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="badge bg-green">Обсуждение манги</div>
+                                <div class="last-activity small text-muted mt-2">
+                                    Последний ответ: 5 мин назад
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="forum-topic card mb-3">
+                    
+                </div>
+            </div>
+
+            
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                </ul>
+            </nav>
+        </div>
+    </main>
+
+    
+    <div class="modal fade" id="newTopicModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Новая тема</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="topicForm">
+                        <div class="mb-4">
+                            <label class="form-label">Заголовок темы</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Раздел</label>
+                            <select class="form-select" required>
+                                <option value="">Выберите раздел</option>
+                                <option>Обсуждение манги</option>
+                                <option>Аниме</option>
+                                <option>Теории</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Содержание</label>
+                            <textarea class="form-control" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-modern w-100">
+                            Создать тему
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
