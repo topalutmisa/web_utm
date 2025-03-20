@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinlandSaga.Web", "VinlandSaga.Web\VinlandSaga.Web.csproj", "{1770866A-7F72-4ECA-BA65-9A797A2726C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinlandSaga.Domain", "VinlandSaga.Domain\VinlandSaga.Domain.csproj", "{98619F8A-932A-46BF-9249-2C077D30B324}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinlandSaga.Infrastructure", "VinlandSaga.Infrastructure\VinlandSaga.Infrastructure.csproj", "{7A49E9B6-9B9B-434E-BDE7-23BC894CA7E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VinlandSaga.Application", "VinlandSaga.Application\VinlandSaga.Application.csproj", "{C24CEADB-3F4B-40AE-BB12-144A78B237FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1770866A-7F72-4ECA-BA65-9A797A2726C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1770866A-7F72-4ECA-BA65-9A797A2726C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1770866A-7F72-4ECA-BA65-9A797A2726C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1770866A-7F72-4ECA-BA65-9A797A2726C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98619F8A-932A-46BF-9249-2C077D30B324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98619F8A-932A-46BF-9249-2C077D30B324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98619F8A-932A-46BF-9249-2C077D30B324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98619F8A-932A-46BF-9249-2C077D30B324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A49E9B6-9B9B-434E-BDE7-23BC894CA7E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A49E9B6-9B9B-434E-BDE7-23BC894CA7E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A49E9B6-9B9B-434E-BDE7-23BC894CA7E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A49E9B6-9B9B-434E-BDE7-23BC894CA7E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C24CEADB-3F4B-40AE-BB12-144A78B237FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C24CEADB-3F4B-40AE-BB12-144A78B237FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C24CEADB-3F4B-40AE-BB12-144A78B237FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C24CEADB-3F4B-40AE-BB12-144A78B237FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
