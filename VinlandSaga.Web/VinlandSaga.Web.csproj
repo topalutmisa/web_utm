@@ -123,11 +123,14 @@
         <Compile Include="App_Start\BundleConfig.cs" />
         <Compile Include="App_Start\FilterConfig.cs" />
         <Compile Include="App_Start\RouteConfig.cs" />
+        <Compile Include="Controllers\AccountController.cs" />
+        <Compile Include="Controllers\AdminController.cs" />
         <Compile Include="Controllers\HomeController.cs" />
         <Compile Include="Controllers\VinlandSagaController.cs" />
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
+        <Compile Include="Models\AccountViewModels.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -189,6 +192,9 @@
         <Content Include="Scripts\jquery.validate.unobtrusive.js" />
         <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
         <Content Include="Scripts\modernizr-2.8.3.js" />
+        <Content Include="Views\Account\Login.cshtml" />
+        <Content Include="Views\Account\Register.cshtml" />
+        <Content Include="Views\Admin\AdminPanel.cshtml" />
         <Content Include="Views\Shared\Partials\_FanartFilters.cshtml" />
         <Content Include="Views\Shared\Partials\_FanartGallery.cshtml" />
         <Content Include="Views\Shared\Partials\_FanartHeader.cshtml" />
@@ -223,7 +229,6 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="App_Data" />
-        <Folder Include="Models" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -239,6 +244,14 @@
         <Content Include="Scripts\jquery-3.3.1.min.map" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\VinlandSaga.Application\VinlandSaga.Application.csproj">
+        <Project>{c24ceadb-3f4b-40ae-bb12-144a78b237fa}</Project>
+        <Name>VinlandSaga.Application</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\VinlandSaga.Domain\VinlandSaga.Domain.csproj">
+        <Project>{98619f8a-932a-46bf-9249-2c077d30b324}</Project>
+        <Name>VinlandSaga.Domain</Name>
+      </ProjectReference>
       <ProjectReference Include="..\VinlandSaga.Infrastructure\VinlandSaga.Infrastructure.csproj">
         <Project>{7a49e9b6-9b9b-434e-bde7-23bc894ca7e4}</Project>
         <Name>VinlandSaga.Infrastructure</Name>

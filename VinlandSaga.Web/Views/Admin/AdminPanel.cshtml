@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Панель администратора";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<main class="admin-section">
+    <div class="container py-5 mt-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Управление сайтом</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-users me-3"></i>
+                            <span>Пользователи</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-user-tag me-3"></i>
+                            <span>Роли</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-newspaper me-3"></i>
+                            <span>Новости</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-comments me-3"></i>
+                            <span>Форум</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-images me-3"></i>
+                            <span>Галерея</span>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="fas fa-palette me-3"></i>
+                            <span>Фан-арт</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Статистика сайта</h5>
+                        <button class="btn btn-sm btn-outline-light">
+                            <i class="fas fa-sync-alt me-1"></i> Обновить
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 text-center">
+                                    <h3 class="fw-bold text-primary">235</h3>
+                                    <p class="text-muted mb-0">Пользователей</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 text-center">
+                                    <h3 class="fw-bold text-success">128</h3>
+                                    <p class="text-muted mb-0">Публикаций</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 text-center">
+                                    <h3 class="fw-bold text-danger">15</h3>
+                                    <p class="text-muted mb-0">Сообщений</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>Последние действия</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Пользователь</th>
+                                            <th>Действие</th>
+                                            <th>Дата</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>admin</td>
+                                            <td>Вход в систему</td>
+                                            <td>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>moderator</td>
+                                            <td>Удаление комментария</td>
+                                            <td>@DateTime.Now.AddHours(-2).ToString("dd.MM.yyyy HH:mm")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>admin</td>
+                                            <td>Добавление новости</td>
+                                            <td>@DateTime.Now.AddHours(-5).ToString("dd.MM.yyyy HH:mm")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>user1</td>
+                                            <td>Регистрация</td>
+                                            <td>@DateTime.Now.AddDays(-1).ToString("dd.MM.yyyy HH:mm")</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section scripts {
+    <script>
+        $(document).ready(function() {
+            // Здесь может быть код для админки
+        });
+    </script>
+} 

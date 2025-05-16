@@ -34,11 +34,35 @@
                     <li class="nav-item">@Html.ActionLink("Форум", "Forum", "VinlandSaga", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Фан-арт", "Fanart", "VinlandSaga", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Контакты", "Contact", "VinlandSaga", null, new { @class = "nav-link" })</li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Profile", "VinlandSaga")">
-                            <i class="fas fa-user me-2"></i>Профиль
-                        </a>
-                    </li>
+                    
+                    @if (Request.IsAuthenticated)
+                    {
+                        if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("AdminPanel", "Admin")">
+                                    <i class="fas fa-cog me-2"></i>Админ-панель
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Выход
+                                </a>
+                            }
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Login", "Account")">
+                                <i class="fas fa-user me-2"></i>Вход
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

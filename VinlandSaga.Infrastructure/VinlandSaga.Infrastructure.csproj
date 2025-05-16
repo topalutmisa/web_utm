@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\VinlandSagaDbContext.cs" />
-    <Compile Include="Data\VinlandSagaDbInitializer.cs" />
     <Compile Include="Migrations\202505151805510_InitialCreate.cs" />
     <Compile Include="Migrations\202505151805510_InitialCreate.Designer.cs">
       <DependentUpon>202505151805510_InitialCreate.cs</DependentUpon>
