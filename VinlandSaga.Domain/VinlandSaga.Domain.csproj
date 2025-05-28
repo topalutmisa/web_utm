@@ -36,9 +36,18 @@
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
+        <Reference Include="System.Web"/>
         <Reference Include="System.Xml"/>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="DTOs\AuthResultDto.cs" />
+        <Compile Include="DTOs\UserProfileDto.cs" />
+        <Compile Include="DTOs\SignOutResultDto.cs" />
+        <Compile Include="DTOs\ForumActionDto.cs" />
+        <Compile Include="DTOs\ForumResultDto.cs" />
+        <Compile Include="DTOs\CharacterDto.cs" />
+        <Compile Include="DTOs\NewsDto.cs" />
+        <Compile Include="DTOs\TopicDto.cs" />
         <Compile Include="Models\AuditLog.cs" />
         <Compile Include="Models\Category.cs" />
         <Compile Include="Models\Character.cs" />
@@ -49,6 +58,7 @@
         <Compile Include="Models\ForumTopic.cs" />
         <Compile Include="Models\Media.cs" />
         <Compile Include="Models\MediaCharacter.cs" />
+        <Compile Include="Models\News.cs" />
         <Compile Include="Models\Permission.cs" />
         <Compile Include="Models\Role.cs" />
         <Compile Include="Models\RolePermission.cs" />

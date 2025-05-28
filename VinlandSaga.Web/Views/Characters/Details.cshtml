@@ -1,0 +1,258 @@
+﻿@model VinlandSaga.Web.Models.CharacterViewModel
+@{
+    ViewBag.Title = "Персонаж: " + Model.Name;
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Characters")">Персонажи</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="character-image-card">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid character-detail-image">
+                }
+                else
+                {
+                    <div class="no-image-placeholder">
+                        <i class="fas fa-user fa-5x text-muted"></i>
+                        <p class="text-muted mt-3">Изображение отсутствует</p>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="character-details-card">
+                <div class="character-header">
+                    <h1 class="character-title">@Model.Name</h1>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Status))
+                    {
+                        <span class="badge bg-primary character-status-badge">@Model.Status</span>
+                    }
+                </div>
+
+                <div class="character-info-grid">
+                    @if (!string.IsNullOrEmpty(Model.Age))
+                    {
+                        <div class="info-item">
+                            <i class="fas fa-birthday-cake info-icon"></i>
+                            <div class="info-content">
+                                <strong>Возраст:</strong>
+                                <span>@Model.Age</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Occupation))
+                    {
+                        <div class="info-item">
+                            <i class="fas fa-briefcase info-icon"></i>
+                            <div class="info-content">
+                                <strong>Род занятий:</strong>
+                                <span>@Model.Occupation</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="character-description">
+                    <h3><i class="fas fa-book-open"></i> Описание</h3>
+                    <p class="description-text">@Model.Description</p>
+                </div>
+
+                <div class="character-actions">
+                    <a href="@Url.Action("Index", "Characters")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Назад к списку
+                    </a>
+                    
+                    @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+                    {
+                        <a href="@Url.Action("Edit", "Characters", new { id = Model.Id })" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Редактировать
+                        </a>
+                    }
+                    
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        using (Html.BeginForm("Delete", "Characters", FormMethod.Post, new { @class = "d-inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("id", Model.Id)
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этого персонажа?')">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.character-image-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.character-detail-image {
+    width: 100%;
+    border-radius: 10px;
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.no-image-placeholder {
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 10px;
+}
+
+.character-details-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    height: 100%;
+}
+
+.character-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.character-title {
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.character-status-badge {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+}
+
+.character-info-grid {
+    margin-bottom: 30px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-icon {
+    color: #3498db;
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content strong {
+    color: #2c3e50;
+    margin-right: 10px;
+}
+
+.character-description {
+    margin-bottom: 30px;
+}
+
+.character-description h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.character-description h3 i {
+    color: #3498db;
+    margin-right: 10px;
+}
+
+.description-text {
+    color: #555;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    text-align: justify;
+}
+
+.character-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.breadcrumb-item a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+@@media (max-width: 768px) {
+    .character-title {
+        font-size: 2rem;
+    }
+    
+    .character-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .character-actions {
+        flex-direction: column;
+    }
+    
+    .character-actions .btn {
+        width: 100%;
+    }
+}
+</style> 

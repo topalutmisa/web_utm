@@ -1,0 +1,179 @@
+﻿@model VinlandSaga.Web.Models.UserDetailsViewModel
+@{
+    ViewBag.Title = "Информация о пользователе";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user"></i> Информация о пользователе</h2>
+        <a href="@Url.Action("Index", "Users")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                    {
+                        <img src="@Model.AvatarUrl" alt="Аватар" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-4x text-muted"></i>
+                        </div>
+                    }
+                    <h4>@Model.DisplayName</h4>
+                    <p class="text-muted">@@@Model.Username</p>
+                    
+                    <div class="mb-3">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success fs-6">Активен</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6">Заблокирован</span>
+                        }
+                        
+                        @if (Model.IsEmailConfirmed)
+                        {
+                            <span class="badge bg-success fs-6">Email подтвержден</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning fs-6">Email не подтвержден</span>
+                        }
+                    </div>
+
+                    <!-- Роли пользователя -->
+                    @if (Model.Roles.Any())
+                    {
+                        <div class="mb-3">
+                            <h6>Роли:</h6>
+                            @foreach (var role in Model.Roles)
+                            {
+                                <span class="badge bg-primary me-1">@role</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Детальная информация</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>ID:</strong></div>
+                        <div class="col-sm-9"><code>@Model.Id</code></div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Email:</strong></div>
+                        <div class="col-sm-9">
+                            @Model.Email
+                            @if (Model.IsEmailConfirmed)
+                            {
+                                <i class="fas fa-check-circle text-success ms-1"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-exclamation-circle text-warning ms-1"></i>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Имя пользователя:</strong></div>
+                        <div class="col-sm-9">@Model.Username</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Дата регистрации:</strong></div>
+                        <div class="col-sm-9">@Model.RegistrationDate.ToString("dd.MM.yyyy HH:mm:ss")</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Последний вход:</strong></div>
+                        <div class="col-sm-9">@Model.LastLoginDate.ToString("dd.MM.yyyy HH:mm:ss")</div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.About))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-3"><strong>О себе:</strong></div>
+                            <div class="col-sm-9">@Model.About</div>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <!-- Действия администратора -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Действия администратора</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            @using (Html.BeginForm("ToggleActive", "Users", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", Model.Id)
+                                if (Model.IsActive)
+                                {
+                                    <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Вы уверены, что хотите заблокировать этого пользователя?')">
+                                        <i class="fas fa-ban"></i> Заблокировать
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Вы уверены, что хотите активировать этого пользователя?')">
+                                        <i class="fas fa-check"></i> Активировать
+                                    </button>
+                                }
+                            }
+                        </div>
+                        
+                        @if (!Model.IsEmailConfirmed)
+                        {
+                            <div class="col-md-6 mb-2">
+                                @using (Html.BeginForm("ConfirmEmail", "Users", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden("id", Model.Id)
+                                    <button type="submit" class="btn btn-info w-100" onclick="return confirm('Подтвердить email этого пользователя?')">
+                                        <i class="fas fa-envelope-check"></i> Подтвердить Email
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

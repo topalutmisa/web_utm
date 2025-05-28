@@ -1,0 +1,114 @@
+﻿@model VinlandSaga.Web.Models.ProfileViewModel
+@{
+    ViewBag.Title = "Мой профиль";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                    {
+                        <img src="@Model.AvatarUrl" alt="Аватар" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-4x text-muted"></i>
+                        </div>
+                    }
+                    <h4>@Model.DisplayName</h4>
+                    <p class="text-muted">@@@Model.Username</p>
+                    @if (Model.IsEmailConfirmed)
+                    {
+                        <span class="badge bg-success">✓ Email подтвержден</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">⚠ Email не подтвержден</span>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Информация о профиле</h5>
+                    <a href="@Url.Action("Edit", "Profile")" class="btn btn-modern">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Email:</strong></div>
+                        <div class="col-sm-9">@Model.Email</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Имя пользователя:</strong></div>
+                        <div class="col-sm-9">@Model.Username</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Дата регистрации:</strong></div>
+                        <div class="col-sm-9">@Model.RegistrationDate.ToString("dd.MM.yyyy HH:mm")</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Последний вход:</strong></div>
+                        <div class="col-sm-9">@Model.LastLoginDate.ToString("dd.MM.yyyy HH:mm")</div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.About))
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-3"><strong>О себе:</strong></div>
+                            <div class="col-sm-9">@Model.About</div>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Быстрые действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <a href="@Url.Action("Gallery", "VinlandSaga")" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-images"></i> Галерея
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="@Url.Action("Forum", "VinlandSaga")" class="btn btn-outline-success w-100">
+                                <i class="fas fa-comments"></i> Форум
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="@Url.Action("Fanart", "VinlandSaga")" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-palette"></i> Фан-арт
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="@Url.Action("Characters", "VinlandSaga")" class="btn btn-outline-info w-100">
+                                <i class="fas fa-users"></i> Персонажи
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

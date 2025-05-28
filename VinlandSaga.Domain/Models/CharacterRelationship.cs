@@ -10,6 +10,8 @@ namespace VinlandSaga.Domain.Models
         public Guid Id { get; set; }
         public Guid SourceCharacterId { get; set; }
         public Guid TargetCharacterId { get; set; }
+        public Guid CharacterId1 { get; set; }
+        public Guid CharacterId2Id { get; set; }
         public string RelationType { get; set; }
         public string Description { get; set; }
         

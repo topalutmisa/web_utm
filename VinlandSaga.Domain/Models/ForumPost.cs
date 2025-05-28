@@ -17,11 +17,12 @@ namespace VinlandSaga.Domain.Models
         
         
         public Guid UserId { get; set; }
-        public Guid ForumTopicId { get; set; }
+        public Guid AuthorId { get; set; }
+        public Guid TopicId { get; set; }
         
         
         public virtual User User { get; set; }
-        public virtual ForumTopic ForumTopic { get; set; }
+        public virtual ForumTopic Topic { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
     }
 } 

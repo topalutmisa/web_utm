@@ -1,0 +1,298 @@
+﻿@model VinlandSaga.Web.Models.EditForumPostViewModel
+@{
+    ViewBag.Title = "Редактировать сообщение";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="edit-post-card">
+                <div class="card-header">
+                    <h2 class="edit-title">
+                        <i class="fas fa-edit"></i>
+                        Редактировать сообщение
+                    </h2>
+                    <p class="edit-subtitle">Внесите необходимые изменения в ваше сообщение</p>
+                </div>
+                
+                <div class="card-body">
+                    @using (Html.BeginForm("EditPost", "Forum", FormMethod.Post, new { @class = "edit-post-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Id)
+                        @Html.HiddenFor(m => m.TopicId)
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                        
+                        <div class="form-group mb-4">
+                            @Html.LabelFor(m => m.Content, new { @class = "form-label" })
+                            @Html.TextAreaFor(m => m.Content, new { @class = "form-control content-editor", rows = "10", placeholder = "Введите содержание сообщения..." })
+                            @Html.ValidationMessageFor(m => m.Content, "", new { @class = "text-danger" })
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Поддерживается форматирование текста. Будьте вежливы и следуйте правилам сообщества.
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-save"></i>
+                                Сохранить изменения
+                            </button>
+                            <a href="@Url.Action("Topic", "Forum", new { id = Model.TopicId })" class="btn btn-cancel">
+                                <i class="fas fa-times"></i>
+                                Отмена
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <!-- Предупреждение -->
+            <div class="edit-warning mt-4">
+                <h5 class="warning-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Важная информация
+                </h5>
+                <ul class="warning-list">
+                    <li>После сохранения будет отображена отметка о редактировании</li>
+                    <li>Убедитесь, что изменения соответствуют правилам форума</li>
+                    <li>Избегайте кардинальных изменений смысла сообщения</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.edit-post-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.edit-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.edit-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.card-body {
+    padding: 40px 30px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-label::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border-radius: 2px;
+}
+
+.content-editor {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    min-height: 250px;
+    resize: vertical;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+.content-editor:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    background: white;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+    color: white;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+.edit-warning {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    border-left: 4px solid #f39c12;
+}
+
+.warning-title {
+    color: #f39c12;
+    margin-bottom: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.warning-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.warning-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #34495e;
+    position: relative;
+    padding-left: 25px;
+}
+
+.warning-list li:last-child {
+    border-bottom: none;
+}
+
+.warning-list li::before {
+    content: '•';
+    color: #f39c12;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.alert-danger {
+    border-radius: 12px;
+    border: none;
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px 20px;
+}
+
+@@media (max-width: 768px) {
+    .card-header {
+        padding: 30px 20px;
+    }
+    
+    .edit-title {
+        font-size: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 30px 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-save, .btn-cancel {
+        width: 100%;
+    }
+}
+</style>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    
+    <script>
+        $(document).ready(function() {
+            // Автоматическое изменение размера textarea
+            $('.content-editor').on('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Предупреждение при попытке покинуть страницу с несохраненными данными
+            var originalContent = $('.content-editor').val();
+            var formChanged = false;
+            
+            $('.content-editor').on('input', function() {
+                formChanged = $(this).val() !== originalContent;
+            });
+            
+            $('.edit-post-form').on('submit', function() {
+                formChanged = false;
+            });
+            
+            $(window).on('beforeunload', function() {
+                if (formChanged) {
+                    return 'У вас есть несохраненные изменения. Вы уверены, что хотите покинуть страницу?';
+                }
+            });
+            
+            // Фокус на поле ввода
+            $('.content-editor').focus();
+        });
+    </script>
+} 

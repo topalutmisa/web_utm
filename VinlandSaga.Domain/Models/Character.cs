@@ -16,8 +16,11 @@ namespace VinlandSaga.Domain.Models
         public string Gender { get; set; }
         public string Occupation { get; set; }
         public string Affiliation { get; set; }
+        public string Clan { get; set; }
         public string FirstAppearance { get; set; }
         public string Status { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public DateTime? DeathDate { get; set; }
         public int PopularityRank { get; set; }
         public bool IsFeatured { get; set; }
         

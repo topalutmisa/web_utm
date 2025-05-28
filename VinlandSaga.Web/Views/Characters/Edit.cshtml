@@ -1,0 +1,281 @@
+﻿@model VinlandSaga.Web.Models.EditCharacterViewModel
+@{
+    ViewBag.Title = "Редактировать персонажа: " + Model.Name;
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Characters")">Персонажи</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Details", "Characters", new { id = Model.Id })">@Model.Name</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Редактирование</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="edit-character-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-edit"></i> Редактировать персонажа</h2>
+                    <p class="text-muted">Измените информацию о персонаже</p>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.Error
+                    </div>
+                }
+
+                @using (Html.BeginForm("Edit", "Characters", FormMethod.Post, new { @class = "character-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.Id)
+
+                    <div class="form-group mb-4">
+                        @Html.LabelFor(m => m.Name, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Введите имя персонажа" })
+                        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group mb-4">
+                        @Html.LabelFor(m => m.Description, new { @class = "form-label" })
+                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "6", placeholder = "Введите описание персонажа" })
+                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group mb-4">
+                        @Html.LabelFor(m => m.ImageUrl, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control", placeholder = "https://example.com/image.jpg" })
+                        @Html.ValidationMessageFor(m => m.ImageUrl, "", new { @class = "text-danger" })
+                        <div class="form-text">Введите URL изображения персонажа</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-4">
+                                @Html.LabelFor(m => m.Age, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = "Например: 25 лет" })
+                                @Html.ValidationMessageFor(m => m.Age, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-4">
+                                @Html.LabelFor(m => m.Status, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Status, new { @class = "form-control", placeholder = "Например: Жив" })
+                                @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        @Html.LabelFor(m => m.Occupation, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Occupation, new { @class = "form-control", placeholder = "Например: Воин, Торговец" })
+                        @Html.ValidationMessageFor(m => m.Occupation, "", new { @class = "text-danger" })
+                    </div>
+
+                    <!-- Предварительный просмотр изображения -->
+                    <div class="image-preview mb-4" id="imagePreview" style="display: none;">
+                        <label class="form-label">Предварительный просмотр:</label>
+                        <div class="preview-container">
+                            <img id="previewImg" src="" alt="Предварительный просмотр" class="img-fluid">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                        <a href="@Url.Action("Details", "Characters", new { id = Model.Id })" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                        <a href="@Url.Action("Index", "Characters")" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> К списку персонажей
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.edit-character-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.card-header h2 {
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.card-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.character-form {
+    padding: 30px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 0.2rem rgba(243, 156, 18, 0.25);
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+.image-preview {
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.preview-container {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.preview-container img {
+    border-radius: 8px;
+    max-height: 200px;
+    object-fit: cover;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    border: none;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+.text-danger {
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.breadcrumb-item a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+@@media (max-width: 768px) {
+    .card-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .character-form {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageUrlInput = document.querySelector('input[name="ImageUrl"]');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    // Показать превью при загрузке страницы, если есть URL
+    if (imageUrlInput.value) {
+        showPreview(imageUrlInput.value);
+    }
+    
+    // Обновлять превью при изменении URL
+    imageUrlInput.addEventListener('input', function() {
+        const url = this.value.trim();
+        if (url) {
+            showPreview(url);
+        } else {
+            hidePreview();
+        }
+    });
+    
+    function showPreview(url) {
+        previewImg.src = url;
+        previewImg.onload = function() {
+            imagePreview.style.display = 'block';
+        };
+        previewImg.onerror = function() {
+            hidePreview();
+        };
+    }
+    
+    function hidePreview() {
+        imagePreview.style.display = 'none';
+    }
+});
+</script> 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -11,28 +12,40 @@ namespace VinlandSaga.Web
     {
         protected void Application_Start()
         {
+            // Включаем поддержку legacy timestamp для PostgreSQL
+            System.AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            
-            // Настройка принципала для обработки IsInRole
         }
-        
+
         protected void Application_AuthenticateRequest(Object sender, EventArgs e)
         {
             if (HttpContext.Current.User != null && HttpContext.Current.User.Identity.IsAuthenticated)
             {
                 if (HttpContext.Current.User.Identity is FormsIdentity formsIdentity)
                 {
+                    // Получаем билет аутентификации из куки
                     FormsAuthenticationTicket ticket = formsIdentity.Ticket;
-                    string userData = ticket.UserData;
-                    string[] userDataParts = userData.Split('|');
                     
-                    if (userDataParts.Length >= 3)
+                    // Разбиваем данные пользователя: userId|email|roles
+                    string[] userData = ticket.UserData.Split('|');
+                    if (userData.Length >= 3)
                     {
-                        string[] roles = { userDataParts[2] };
-                        HttpContext.Current.User = new System.Security.Principal.GenericPrincipal(formsIdentity, roles);
+                        // Получаем строку ролей и разделяем их по запятой
+                        string rolesString = userData[2];
+                        string[] roles = rolesString.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        
+                        // Убираем лишние пробелы из ролей
+                        for (int i = 0; i < roles.Length; i++)
+                        {
+                            roles[i] = roles[i].Trim();
+                        }
+                        
+                        // Устанавливаем принципал с ролями
+                        HttpContext.Current.User = new GenericPrincipal(formsIdentity, roles);
                     }
                 }
             }

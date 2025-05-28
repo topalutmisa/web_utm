@@ -1,0 +1,391 @@
+﻿@{
+    ViewBag.Title = "Активность пользователей";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="activity-header">
+        <h1 class="page-title">
+            <i class="fas fa-chart-line"></i>
+            Активность пользователей
+        </h1>
+        <p class="page-subtitle">Аналитика и статистика активности за последние 30 дней</p>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Ошибка:</strong> @ViewBag.Error
+        </div>
+    }
+
+    <!-- Статистика за месяц -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="stats-overview">
+                <h3 class="stats-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Статистика за последние 30 дней
+                </h3>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="metric-card new-users">
+                            <div class="metric-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-number">@(ViewBag.NewUsersThisMonth ?? 0)</div>
+                                <div class="metric-label">Новых пользователей</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="metric-card active-users">
+                            <div class="metric-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-number">@(ViewBag.ActiveUsersThisMonth ?? 0)</div>
+                                <div class="metric-label">Активных пользователей</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="metric-card new-topics">
+                            <div class="metric-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-number">@(ViewBag.NewTopicsThisMonth ?? 0)</div>
+                                <div class="metric-label">Новых тем</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="metric-card new-posts">
+                            <div class="metric-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div class="metric-info">
+                                <div class="metric-number">@(ViewBag.NewPostsThisMonth ?? 0)</div>
+                                <div class="metric-label">Новых сообщений</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Топ активных пользователей -->
+    <div class="row">
+        <div class="col-12">
+            <div class="top-users-card">
+                <h4 class="card-title">
+                    <i class="fas fa-trophy"></i>
+                    Топ активных пользователей
+                </h4>
+                @if (ViewBag.TopActiveUsers != null && ((System.Collections.IList)ViewBag.TopActiveUsers).Count > 0)
+                {
+                    <div class="users-table-container">
+                        <table class="table users-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> #</th>
+                                    <th><i class="fas fa-user"></i> Пользователь</th>
+                                    <th><i class="fas fa-envelope"></i> Email</th>
+                                    <th><i class="fas fa-clock"></i> Последний вход</th>
+                                    <th><i class="fas fa-cogs"></i> Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int index = 1;}
+                                @foreach (var user in ViewBag.TopActiveUsers)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="rank-badge rank-@index">@index</span>
+                                        </td>
+                                        <td>
+                                            <div class="user-info">
+                                                <div class="user-avatar">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div class="user-details">
+                                                    <strong>@user.Username</strong>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="email-text">@user.Email</span>
+                                        </td>
+                                        <td>
+                                            <span class="date-text">@user.LastLoginDate.ToString("dd.MM.yyyy HH:mm")</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="@Url.Action("Details", "Users", new { id = user.Username })" class="btn btn-sm btn-info" title="Подробности">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-warning" title="Отправить сообщение">
+                                                    <i class="fas fa-envelope"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-data">
+                        <i class="fas fa-users-slash"></i>
+                        <p>Нет данных об активных пользователях за последние 30 дней</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Действия -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="actions-card">
+                <h4 class="card-title">
+                    <i class="fas fa-tools"></i>
+                    Управление
+                </h4>
+                <div class="action-buttons">
+                    <a href="@Url.Action("AdminPanel", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i>
+                        Вернуться к панели
+                    </a>
+                    <a href="@Url.Action("Index", "Users")" class="btn btn-success">
+                        <i class="fas fa-users-cog"></i>
+                        Управление пользователями
+                    </a>
+                    <a href="@Url.Action("SystemInfo", "Admin")" class="btn btn-info">
+                        <i class="fas fa-server"></i>
+                        Информация о системе
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.activity-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(142, 68, 173, 0.3);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.stats-overview, .top-users-card, .actions-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.stats-title, .card-title {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.new-users { border-left: 4px solid #3498db; }
+.active-users { border-left: 4px solid #2ecc71; }
+.new-topics { border-left: 4px solid #f39c12; }
+.new-posts { border-left: 4px solid #9b59b6; }
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.new-users .metric-icon { background: #3498db; }
+.active-users .metric-icon { background: #2ecc71; }
+.new-topics .metric-icon { background: #f39c12; }
+.new-posts .metric-icon { background: #9b59b6; }
+
+.metric-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.metric-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.users-table-container {
+    overflow-x: auto;
+}
+
+.users-table {
+    margin-bottom: 0;
+}
+
+.users-table th {
+    background: #f8f9fa;
+    border: none;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 15px;
+}
+
+.users-table td {
+    padding: 15px;
+    vertical-align: middle;
+    border-top: 1px solid #e0e0e0;
+}
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.rank-1 { background: #f39c12; }
+.rank-2 { background: #95a5a6; }
+.rank-3 { background: #e67e22; }
+.rank-badge:not(.rank-1):not(.rank-2):not(.rank-3) { background: #3498db; }
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #3498db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.email-text {
+    color: #7f8c8d;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.date-text {
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-buttons .btn {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+}
+
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.no-data i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-data p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .metric-card {
+        margin-bottom: 15px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 10px 8px;
+        font-size: 0.9rem;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+}
+</style> 

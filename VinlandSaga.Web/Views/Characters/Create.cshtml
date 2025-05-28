@@ -1,0 +1,76 @@
+﻿@model VinlandSaga.Web.Models.CreateCharacterViewModel
+@{
+    ViewBag.Title = "Добавить персонажа";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-plus"></i> Добавить нового персонажа</h3>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Create", "Characters", FormMethod.Post, new { @class = "character-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+                        
+                        <div class="mb-4">
+                            @Html.LabelFor(m => m.Name, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Введите имя персонажа" })
+                            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <div class="mb-4">
+                            @Html.LabelFor(m => m.Description, new { @class = "form-label" })
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "6", placeholder = "Опишите персонажа, его историю, характер..." })
+                            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                @Html.LabelFor(m => m.Age, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Age, new { @class = "form-control", placeholder = "Возраст (например: 25 лет, Неизвестно)" })
+                                @Html.ValidationMessageFor(m => m.Age, "", new { @class = "text-danger" })
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                @Html.LabelFor(m => m.Status, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.Status, new { @class = "form-control", placeholder = "Живой, Мертвый, Неизвестно..." })
+                                @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            @Html.LabelFor(m => m.Occupation, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Occupation, new { @class = "form-control", placeholder = "Воин, Торговец, Фермер..." })
+                            @Html.ValidationMessageFor(m => m.Occupation, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <div class="mb-4">
+                            @Html.LabelFor(m => m.ImageUrl, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.ImageUrl, new { @class = "form-control", placeholder = "https://example.com/character-image.jpg" })
+                            @Html.ValidationMessageFor(m => m.ImageUrl, "", new { @class = "text-danger" })
+                            <div class="form-text">Введите URL изображения персонажа</div>
+                        </div>
+                        
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-modern">
+                                <i class="fas fa-save"></i> Создать персонажа
+                            </button>
+                            <a href="@Url.Action("Index", "Characters")" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Отмена
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+} 

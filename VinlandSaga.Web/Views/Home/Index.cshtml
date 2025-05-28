@@ -1,0 +1,314 @@
+@{
+    ViewBag.Title = "Добро пожаловать в мир Vinland Saga";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">Добро пожаловать в мир <span class="text-primary">Vinland Saga</span></h1>
+                    <p class="hero-description">
+                        Погрузитесь в эпическую сагу о викингах, чести и поиске истинного смысла жизни. 
+                        Присоединяйтесь к нашему сообществу поклонников манги и аниме Vinland Saga.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="@Url.Action("Index", "Forum")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-comments"></i>
+                            Перейти к форуму
+                        </a>
+                        <a href="@Url.Action("Register", "Account")" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-user-plus"></i>
+                            Присоединиться
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <div class="image-placeholder">
+                        <i class="fas fa-ship"></i>
+                        <p>Vinland Saga</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="section-title">Исследуйте мир Vinland Saga</h2>
+                <p class="section-subtitle">Откройте для себя все аспекты этой удивительной истории</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4 class="feature-title">Форум сообщества</h4>
+                    <p class="feature-description">
+                        Обсуждайте последние главы манги, эпизоды аниме и делитесь теориями с другими фанатами.
+                    </p>
+                    <a href="@Url.Action("Index", "Forum")" class="feature-link">
+                        Перейти к форуму <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="feature-title">Персонажи</h4>
+                    <p class="feature-description">
+                        Изучайте подробную информацию о персонажах, их историях и развитии на протяжении сюжета.
+                    </p>
+                    <a href="@Url.Action("Index", "Characters")" class="feature-link">
+                        Смотреть персонажей <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <h4 class="feature-title">Новости</h4>
+                    <p class="feature-description">
+                        Будьте в курсе последних новостей о манге, аниме и всех событиях связанных с Vinland Saga.
+                    </p>
+                    <a href="@Url.Action("Index", "News")" class="feature-link">
+                        Читать новости <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h3 class="stats-title">Наше сообщество</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Участников</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Обсуждений</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Персонажей</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Активность</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 100px 0;
+    margin-top: -80px;
+    padding-top: 180px;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.hero-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.hero-image {
+    text-align: center;
+}
+
+.image-placeholder {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 60px 30px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.image-placeholder i {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    opacity: 0.8;
+}
+
+.image-placeholder p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.features-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    color: white;
+    font-size: 2rem;
+}
+
+.feature-title {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.feature-description {
+    color: #7f8c8d;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.feature-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.feature-link:hover {
+    color: #764ba2;
+    text-decoration: none;
+}
+
+.stats-section {
+    background: #2c3e50;
+    color: white;
+    padding: 60px 0;
+}
+
+.stats-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .feature-card {
+        margin-bottom: 30px;
+    }
+}
+</style> 

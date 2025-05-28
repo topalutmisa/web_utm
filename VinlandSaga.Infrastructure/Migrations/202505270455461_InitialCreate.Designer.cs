@@ -13,7 +13,7 @@ namespace VinlandSaga.Infrastructure.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202505151805510_InitialCreate"; }
+            get { return "202505270455461_InitialCreate"; }
         }
         
         string IMigrationMetadata.Source

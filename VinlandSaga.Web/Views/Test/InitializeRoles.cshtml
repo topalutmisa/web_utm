@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = "Инициализация ролей";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Инициализация базовых ролей</h3>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Success == true)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> @ViewBag.Message
+                        </div>
+                        
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5>Общее количество ролей в системе</h5>
+                                <h2 class="text-success">@ViewBag.TotalRoles</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h5>Созданные роли:</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item">👑 <strong>Administrator</strong> - Полный доступ ко всем функциям сайта</li>
+                                <li class="list-group-item">🛡️ <strong>Moderator</strong> - Управление контентом и пользователями</li>
+                                <li class="list-group-item">👤 <strong>User</strong> - Стандартный доступ к сайту</li>
+                                <li class="list-group-item">🎨 <strong>Artist</strong> - Подтвержденный статус художника для загрузки фан-арта</li>
+                            </ul>
+                        </div>
+                    }
+                    else if (ViewBag.Success == false)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> @ViewBag.Message
+                        </div>
+                        
+                        if (ViewBag.InnerError != null)
+                        {
+                            <div class="alert alert-warning">
+                                <strong>Детали ошибки:</strong> @ViewBag.InnerError
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Эта страница создаст базовые роли в системе, если они отсутствуют.
+                        </div>
+                        
+                        <div class="text-center">
+                            <p>Будут созданы следующие роли:</p>
+                            <ul class="list-group">
+                                <li class="list-group-item">👑 <strong>Administrator</strong> - Полный доступ ко всем функциям сайта</li>
+                                <li class="list-group-item">🛡️ <strong>Moderator</strong> - Управление контентом и пользователями</li>
+                                <li class="list-group-item">👤 <strong>User</strong> - Стандартный доступ к сайту</li>
+                                <li class="list-group-item">🎨 <strong>Artist</strong> - Подтвержденный статус художника для загрузки фан-арта</li>
+                            </ul>
+                        </div>
+                    }
+                    
+                    <div class="mt-4 text-center">
+                        <a href="@Url.Action("DatabaseConnection", "Test")" class="btn btn-secondary">
+                            <i class="fas fa-database"></i> Тест подключения к БД
+                        </a>
+                        <a href="@Url.Action("Register", "Account")" class="btn btn-success">
+                            <i class="fas fa-user-plus"></i> Попробовать регистрацию
+                        </a>
+                        <a href="@Url.Action("Index", "VinlandSaga")" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Главная
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

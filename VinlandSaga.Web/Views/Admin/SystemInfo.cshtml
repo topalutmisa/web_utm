@@ -1,0 +1,322 @@
+﻿@{
+    ViewBag.Title = "Информация о системе";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="system-info-header">
+        <h1 class="page-title">
+            <i class="fas fa-server"></i>
+            Информация о системе
+        </h1>
+        <p class="page-subtitle">Техническая информация и состояние сервера</p>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Ошибка:</strong> @ViewBag.Error
+        </div>
+    }
+
+    <div class="row">
+        <!-- Основная информация -->
+        <div class="col-lg-6 mb-4">
+            <div class="info-card">
+                <h4 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Основная информация
+                </h4>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Время сервера:</span>
+                        <span class="info-value">@ViewBag.ServerTime</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Версия приложения:</span>
+                        <span class="info-value">@ViewBag.ApplicationVersion</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Версия .NET:</span>
+                        <span class="info-value">@ViewBag.DotNetVersion</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Имя машины:</span>
+                        <span class="info-value">@ViewBag.MachineName</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Производительность -->
+        <div class="col-lg-6 mb-4">
+            <div class="info-card">
+                <h4 class="card-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Производительность
+                </h4>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Количество процессоров:</span>
+                        <span class="info-value">@ViewBag.ProcessorCount</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Рабочий набор памяти:</span>
+                        <span class="info-value">@((ViewBag.WorkingSet / 1024 / 1024).ToString("N0")) МБ</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Операционная система:</span>
+                        <span class="info-value">@ViewBag.OSVersion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Статус компонентов -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="info-card">
+                <h4 class="card-title">
+                    <i class="fas fa-heartbeat"></i>
+                    Статус компонентов
+                </h4>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="status-item status-online">
+                            <div class="status-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-name">Веб-сервер</div>
+                                <div class="status-state">Онлайн</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="status-item status-online">
+                            <div class="status-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-name">База данных</div>
+                                <div class="status-state">Подключена</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="status-item status-online">
+                            <div class="status-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-name">Аутентификация</div>
+                                <div class="status-state">Активна</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="status-item status-online">
+                            <div class="status-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-name">Форум</div>
+                                <div class="status-state">Работает</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Действия -->
+    <div class="row">
+        <div class="col-12">
+            <div class="actions-card">
+                <h4 class="card-title">
+                    <i class="fas fa-tools"></i>
+                    Быстрые действия
+                </h4>
+                <div class="action-buttons">
+                    <a href="@Url.Action("AdminPanel", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i>
+                        Вернуться к панели
+                    </a>
+                    <a href="@Url.Action("DatabaseConnection", "Test")" class="btn btn-info">
+                        <i class="fas fa-database"></i>
+                        Тест БД
+                    </a>
+                    <a href="@Url.Action("UserActivity", "Admin")" class="btn btn-success">
+                        <i class="fas fa-chart-line"></i>
+                        Активность
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.system-info-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(22, 160, 133, 0.3);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.info-card, .actions-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    height: 100%;
+}
+
+.card-title {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.info-value {
+    color: #7f8c8d;
+    font-family: 'Courier New', monospace;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.status-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.status-online {
+    border-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.05);
+}
+
+.status-offline {
+    border-color: #e74c3c;
+    background: rgba(231, 76, 60, 0.05);
+}
+
+.status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.status-online .status-icon {
+    background: #2ecc71;
+}
+
+.status-offline .status-icon {
+    background: #e74c3c;
+}
+
+.status-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 3px;
+}
+
+.status-state {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+@@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .action-buttons {
+        justify-content: center;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style> 

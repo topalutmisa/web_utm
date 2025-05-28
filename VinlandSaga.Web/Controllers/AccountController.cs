@@ -1,20 +1,19 @@
 using System;
 using System.Web.Mvc;
-using System.Web.Security;
-using VinlandSaga.Application.Services;
-using VinlandSaga.Infrastructure.Data;
+using VinlandSaga.Application.BussinessLogic;
+using VinlandSaga.Application.BussinessLogic.Interfaces;
 using VinlandSaga.Web.Models;
 
 namespace VinlandSaga.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly AuthService _authService;
+        private readonly IUserBL _userBL;
 
         public AccountController()
         {
-            var dbContext = new VinlandSagaDbContext(); // In a real application, it's better to use DI
-            _authService = new AuthService(dbContext);
+            var factory = BusinessLogicFactory.Instance;
+            _userBL = factory.GetUserBL();
         }
 
         [HttpGet]
@@ -36,11 +35,17 @@ namespace VinlandSaga.Web.Controllers
                 return View(model);
             }
 
-            var user = _authService.AuthenticateUser(model.Email, model.Password);
-            if (user == null)
+            var result = _userBL.Login(model.Email, model.Password);
+            if (!result.IsSuccess)
             {
-                ModelState.AddModelError("", "Invalid email or password");
+                ModelState.AddModelError("", result.ErrorMessage);
                 return View(model);
+            }
+
+            // Устанавливаем cookie аутентификации
+            if (result.AuthCookie != null)
+            {
+                Response.Cookies.Add(result.AuthCookie);
             }
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -72,17 +77,21 @@ namespace VinlandSaga.Web.Controllers
 
             try
             {
-                var user = _authService.RegisterUser(model.Username, model.Email, model.Password);
+                var result = _userBL.Register(model.Username, model.Email, model.Password, model.Username);
+                
+                if (!result.IsSuccess)
+                {
+                    ModelState.AddModelError("", result.ErrorMessage);
+                    return View(model);
+                }
+
+                TempData["SuccessMessage"] = "Регистрация прошла успешно! Теперь вы можете войти в систему.";
                 return RedirectToAction("Login");
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
-                return View(model);
-            }
-            catch (Exception)
-            {
-                ModelState.AddModelError("", "Registration error. Please try again later.");
+                ModelState.AddModelError("", "Ошибка регистрации. Попробуйте позже.");
+                System.Diagnostics.Debug.WriteLine($"Registration Error: {ex.Message}");
                 return View(model);
             }
         }
@@ -92,7 +101,13 @@ namespace VinlandSaga.Web.Controllers
         [Authorize]
         public ActionResult Logout()
         {
-            _authService.LogoutUser();
+            var result = _userBL.SignOut();
+            
+            if (result.IsSuccess && result.ExpiredCookie != null)
+            {
+                Response.Cookies.Add(result.ExpiredCookie);
+            }
+
             return RedirectToAction("Index", "VinlandSaga");
         }
 
@@ -100,13 +115,13 @@ namespace VinlandSaga.Web.Controllers
         [Authorize]
         public ActionResult Profile()
         {
-            var user = _authService.GetCurrentUser();
-            if (user == null)
+            var userProfile = _userBL.GetUserProfile(User.Identity.Name);
+            if (userProfile == null)
             {
                 return RedirectToAction("Login");
             }
 
-            return View();
+            return View(userProfile);
         }
     }
 } 

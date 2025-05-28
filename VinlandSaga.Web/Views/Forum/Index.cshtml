@@ -1,0 +1,509 @@
+﻿@model VinlandSaga.Web.Models.ForumIndexViewModel
+@{
+    ViewBag.Title = "Форум Vinland Saga";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="forum-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="forum-title">
+                    <i class="fas fa-comments"></i>
+                    Форум Vinland Saga
+                </h1>
+                <p class="forum-subtitle">Обсуждайте мангу, аниме и делитесь впечатлениями с другими фанатами</p>
+            </div>
+            <div class="col-lg-4 text-end">
+                @if (Request.IsAuthenticated)
+                {
+                    <a href="@Url.Action("CreateTopic", "Forum")" class="btn btn-hero">
+                        <i class="fas fa-plus"></i> Создать тему
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-hero">
+                        <i class="fas fa-sign-in-alt"></i> Войти для участия
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Категории -->
+        <div class="col-lg-3 mb-4">
+            <div class="forum-sidebar">
+                <h5 class="sidebar-title">
+                    <i class="fas fa-folder"></i> Категории
+                </h5>
+                <div class="categories-list">
+                    <a href="@Url.Action("Index", "Forum")" 
+                       class="category-item @(Model.SelectedCategoryId == null ? "active" : "")">
+                        <i class="fas fa-globe"></i>
+                        <span>Все темы</span>
+                        <span class="topic-count">@Model.TotalTopics</span>
+                    </a>
+                    
+                    @foreach (var category in Model.Categories)
+                    {
+                        <a href="@Url.Action("Index", "Forum", new { categoryId = category.Id })" 
+                           class="category-item @(Model.SelectedCategoryId == category.Id ? "active" : "")">
+                            <i class="fas fa-tag"></i>
+                            <span>@category.Name</span>
+                            <span class="topic-count">@category.TopicsCount</span>
+                        </a>
+                    }
+                </div>
+                
+                <div class="forum-stats mt-4">
+                    <h6 class="stats-title">Статистика форума</h6>
+                    <div class="stat-item">
+                        <i class="fas fa-comments text-primary"></i>
+                        <span>Тем: @Model.TotalTopics</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-users text-success"></i>
+                        <span>Участников: @ViewBag.UsersCount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список тем -->
+        <div class="col-lg-9">
+            @if (Model.Topics.Any())
+            {
+                <div class="forum-topics">
+                    @foreach (var topic in Model.Topics)
+                    {
+                        <div class="topic-card @(topic.IsPinned ? "pinned" : "") @(topic.IsLocked ? "locked" : "")" 
+                             onmousemove="cardParallax(event, this)">
+                            <div class="topic-header">
+                                <div class="topic-icons">
+                                    @if (topic.IsPinned)
+                                    {
+                                        <i class="fas fa-thumbtack text-warning" title="Закреплено"></i>
+                                    }
+                                    @if (topic.IsLocked)
+                                    {
+                                        <i class="fas fa-lock text-danger" title="Заблокировано"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-comment text-primary"></i>
+                                    }
+                                </div>
+                                
+                                <div class="topic-content">
+                                    <h5 class="topic-title">
+                                        <a href="@Url.Action("Topic", "Forum", new { id = topic.Id })">
+                                            @topic.Title
+                                        </a>
+                                    </h5>
+                                    
+                                    @if (!string.IsNullOrEmpty(topic.Description))
+                                    {
+                                        <p class="topic-description">@topic.Description</p>
+                                    }
+                                    
+                                    <div class="topic-meta">
+                                        <span class="author">
+                                            <i class="fas fa-user"></i>
+                                            @topic.AuthorName
+                                        </span>
+                                        <span class="date">
+                                            <i class="fas fa-clock"></i>
+                                            @topic.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                                        </span>
+                                        @if (topic.LastPostDate != topic.CreatedDate)
+                                        {
+                                            <span class="last-post">
+                                                <i class="fas fa-reply"></i>
+                                                Последний ответ: @topic.LastPostDate.ToString("dd.MM.yyyy HH:mm")
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="topic-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-number">@topic.PostsCount</span>
+                                        <span class="stat-label">ответов</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number">@topic.ViewsCount</span>
+                                        <span class="stat-label">просмотров</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Пагинация -->
+                if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Навигация по страницам" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            @if (Model.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1, categoryId = Model.SelectedCategoryId })">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = i, categoryId = Model.SelectedCategoryId })">@i</a>
+                                </li>
+                            }
+
+                            @if (Model.CurrentPage < Model.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1, categoryId = Model.SelectedCategoryId })">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="empty-forum">
+                    <div class="empty-icon">
+                        <i class="fas fa-comments fa-4x"></i>
+                    </div>
+                    <h4>Пока нет тем для обсуждения</h4>
+                    <p class="text-muted">
+                        @if (Model.SelectedCategoryId.HasValue)
+                        {
+                            <span>В этой категории пока нет тем.</span>
+                        }
+                        else
+                        {
+                            <span>Форум пока пуст. Станьте первым, кто начнет обсуждение!</span>
+                        }
+                    </p>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <a href="@Url.Action("CreateTopic", "Forum")" class="btn btn-modern mt-3">
+                            <i class="fas fa-plus"></i> Создать первую тему
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-modern mt-3">
+                            <i class="fas fa-sign-in-alt"></i> Войти, чтобы создать тему
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.forum-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 60px 0;
+    margin-top: -80px; /* Компенсируем отступ main-content */
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+}
+
+.forum-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.forum-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.btn-hero {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-hero:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.forum-sidebar {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.sidebar-title {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.categories-list {
+    margin-bottom: 20px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #34495e;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.category-item:hover {
+    background: #f8f9fa;
+    color: #2c3e50;
+    text-decoration: none;
+    transform: translateX(5px);
+}
+
+.category-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.category-item i {
+    margin-right: 10px;
+    width: 16px;
+}
+
+.category-item span:first-of-type {
+    flex: 1;
+}
+
+.topic-count {
+    background: rgba(0,0,0,0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.category-item.active .topic-count {
+    background: rgba(255,255,255,0.2);
+}
+
+.forum-stats {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+.stats-title {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #7f8c8d;
+}
+
+.stat-item i {
+    margin-right: 10px;
+    width: 16px;
+}
+
+.topic-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.topic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.topic-card.pinned {
+    border-left: 4px solid #f39c12;
+}
+
+.topic-card.locked {
+    border-left: 4px solid #e74c3c;
+    opacity: 0.8;
+}
+
+.topic-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.topic-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.topic-content {
+    flex: 1;
+}
+
+.topic-title {
+    margin-bottom: 10px;
+}
+
+.topic-title a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.topic-title a:hover {
+    color: #667eea;
+}
+
+.topic-description {
+    color: #7f8c8d;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.topic-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.topic-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.topic-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.topic-stats .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #95a5a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.empty-forum {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+    color: #bdc3c7;
+    margin-bottom: 30px;
+}
+
+.empty-forum h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+@@media (max-width: 768px) {
+    .forum-hero {
+        padding: 40px 0;
+    }
+    
+    .forum-title {
+        font-size: 2rem;
+    }
+    
+    .topic-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .topic-stats {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .topic-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style> 

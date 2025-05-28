@@ -47,8 +47,17 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BussinessLogic\BusinessLogicFactory.cs" />
+        <Compile Include="BussinessLogic\Core\BaseApi.cs" />
+        <Compile Include="BussinessLogic\Interfaces\IUserBL.cs" />
+        <Compile Include="BussinessLogic\Interfaces\IForumBL.cs" />
+        <Compile Include="BussinessLogic\Interfaces\ICharacterBL.cs" />
+        <Compile Include="BussinessLogic\Interfaces\INewsBL.cs" />
+        <Compile Include="BussinessLogic\BLogic\UserBL.cs" />
+        <Compile Include="BussinessLogic\BLogic\ForumBL.cs" />
+        <Compile Include="BussinessLogic\BLogic\CharacterBL.cs" />
+        <Compile Include="BussinessLogic\BLogic\NewsBL.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Services\AuthService.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\VinlandSaga.Domain\VinlandSaga.Domain.csproj">

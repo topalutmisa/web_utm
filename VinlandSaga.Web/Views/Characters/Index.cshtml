@@ -1,0 +1,233 @@
+﻿@model VinlandSaga.Web.Models.CharactersListViewModel
+@{
+    ViewBag.Title = "Персонажи Vinland Saga";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-users"></i> Персонажи Vinland Saga</h2>
+        @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+        {
+            <a href="@Url.Action("Create", "Characters")" class="btn btn-modern">
+                <i class="fas fa-plus"></i> Добавить персонажа
+            </a>
+        }
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Поиск -->
+    <div class="card mb-4">
+        <div class="card-body">
+            @using (Html.BeginForm("Index", "Characters", FormMethod.Get, new { @class = "row g-3" }))
+            {
+                <div class="col-md-10">
+                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control" placeholder="Поиск персонажей по имени или описанию...">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-modern w-100">
+                        <i class="fas fa-search"></i> Найти
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Список персонажей -->
+    @if (Model.Characters.Any())
+    {
+        <div class="row g-4">
+            @foreach (var character in Model.Characters)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="character-card h-100" onmousemove="cardParallax(event, this)">
+                        <div class="character-image">
+                            @if (!string.IsNullOrEmpty(character.ImageUrl))
+                            {
+                                <img src="@character.ImageUrl" alt="@character.Name" class="img-fluid">
+                            }
+                            else
+                            {
+                                <div class="no-image d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-user fa-4x text-muted"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="character-info">
+                            <h5 class="character-name">@character.Name</h5>
+                            
+                            @if (!string.IsNullOrEmpty(character.Age))
+                            {
+                                <p class="character-age"><i class="fas fa-birthday-cake"></i> @character.Age</p>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(character.Occupation))
+                            {
+                                <p class="character-occupation"><i class="fas fa-briefcase"></i> @character.Occupation</p>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(character.Status))
+                            {
+                                <p class="character-status">
+                                    <span class="badge bg-secondary">@character.Status</span>
+                                </p>
+                            }
+                            
+                            <p class="character-description">
+                                @if (character.Description.Length > 150)
+                                {
+                                    @(character.Description.Substring(0, 150) + "...")
+                                }
+                                else
+                                {
+                                    @character.Description
+                                }
+                            </p>
+                            
+                            <div class="character-actions">
+                                <a href="@Url.Action("Details", new { id = character.Id })" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Подробнее
+                                </a>
+                                
+                                @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+                                {
+                                    <a href="@Url.Action("Edit", new { id = character.Id })" class="btn btn-outline-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Редактировать
+                                    </a>
+                                }
+                                
+                                @if (User.IsInRole("Administrator"))
+                                {
+                                    using (Html.BeginForm("Delete", "Characters", FormMethod.Post, new { @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("id", character.Id)
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить этого персонажа?')">
+                                            <i class="fas fa-trash"></i> Удалить
+                                        </button>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <h5>Персонажи не найдены</h5>
+            <p class="text-muted">
+                @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                {
+                    <span>По запросу "@Model.SearchTerm" ничего не найдено.</span>
+                }
+                else
+                {
+                    <span>Персонажи еще не добавлены.</span>
+                }
+            </p>
+            @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+            {
+                <a href="@Url.Action("Create", "Characters")" class="btn btn-modern mt-3">
+                    <i class="fas fa-plus"></i> Добавить первого персонажа
+                </a>
+            }
+        </div>
+    }
+</div>
+
+<style>
+.character-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.character-image {
+    height: 250px;
+    overflow: hidden;
+    position: relative;
+}
+
+.character-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.character-card:hover .character-image img {
+    transform: scale(1.05);
+}
+
+.no-image {
+    height: 100%;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.character-info {
+    padding: 20px;
+}
+
+.character-name {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.character-age, .character-occupation {
+    color: #7f8c8d;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.character-status {
+    margin-bottom: 15px;
+}
+
+.character-description {
+    color: #34495e;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.character-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+</style> 

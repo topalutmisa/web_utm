@@ -1,0 +1,414 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using VinlandSaga.Application.BussinessLogic.Core;
+using VinlandSaga.Application.BussinessLogic.Interfaces;
+using VinlandSaga.Domain.DTOs;
+using VinlandSaga.Domain.Models;
+
+namespace VinlandSaga.Application.BussinessLogic.BLogic
+{
+    public class ForumBL : BaseApi, IForumBL
+    {
+        public ForumResultDto CreateTopic(ForumActionDto actionDto)
+        {
+            try
+            {
+                var topic = new ForumTopic
+                {
+                    Id = Guid.NewGuid(),
+                    Title = actionDto.Title,
+                    Description = actionDto.Content,
+                    Content = actionDto.Content,
+                    UserId = actionDto.UserId,
+                    AuthorId = actionDto.UserId,
+                    CategoryId = actionDto.CategoryId ?? Guid.Empty,
+                    CreatedDate = DateTime.Now,
+                    LastPostDate = DateTime.Now,
+                    ViewsCount = 0,
+                    PostsCount = 0,
+                    IsPinned = false,
+                    IsSticky = false,
+                    IsLocked = false
+                };
+
+                _context.ForumTopics.Add(topic);
+                SaveChanges();
+
+                return new ForumResultDto
+                {
+                    IsSuccess = true,
+                    Message = "Тема успешно создана",
+                    CreatedTopicId = topic.Id
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ForumResultDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка создания темы: {ex.Message}"
+                };
+            }
+        }
+
+        public TopicDto GetTopic(Guid topicId)
+        {
+            try
+            {
+                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == topicId);
+                if (topic == null) return null;
+
+                return MapTopicToDto(topic);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<TopicDto> GetTopicsByCategory(Guid categoryId, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var skip = (page - 1) * pageSize;
+                return _context.ForumTopics
+                    .Where(t => t.CategoryId == categoryId)
+                    .OrderByDescending(t => t.IsSticky)
+                    .ThenByDescending(t => t.LastPostDate)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .Select(t => MapTopicToDto(t))
+                    .Where(dto => dto != null)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<TopicDto>();
+            }
+        }
+
+        public List<TopicDto> GetRecentTopics(int count = 10)
+        {
+            try
+            {
+                return _context.ForumTopics
+                    .OrderByDescending(t => t.CreatedDate)
+                    .Take(count)
+                    .Select(t => MapTopicToDto(t))
+                    .Where(dto => dto != null)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<TopicDto>();
+            }
+        }
+
+        public List<TopicDto> GetFeaturedTopics(int count = 5)
+        {
+            try
+            {
+                return _context.ForumTopics
+                    .Where(t => t.IsSticky || t.ViewsCount > 100) // Критерии для рекомендуемых
+                    .OrderByDescending(t => t.ViewsCount)
+                    .Take(count)
+                    .Select(t => MapTopicToDto(t))
+                    .Where(dto => dto != null)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<TopicDto>();
+            }
+        }
+
+        public bool UpdateTopic(TopicDto topicDto)
+        {
+            try
+            {
+                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == topicDto.Id);
+                if (topic == null) return false;
+
+                topic.Title = topicDto.Title;
+                topic.Content = topicDto.Content;
+                topic.IsSticky = topicDto.IsSticky;
+                topic.IsLocked = topicDto.IsLocked;
+
+                SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool DeleteTopic(Guid topicId)
+        {
+            try
+            {
+                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == topicId);
+                if (topic == null) return false;
+
+                // Удаляем все посты в теме
+                var posts = _context.ForumPosts.Where(p => p.TopicId == topicId).ToList();
+                _context.ForumPosts.RemoveRange(posts);
+
+                _context.ForumTopics.Remove(topic);
+                SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public ForumResultDto CreatePost(ForumActionDto actionDto)
+        {
+            try
+            {
+                var post = new ForumPost
+                {
+                    Id = Guid.NewGuid(),
+                    Content = actionDto.Content,
+                    UserId = actionDto.UserId,
+                    AuthorId = actionDto.UserId,
+                    TopicId = actionDto.TopicId ?? Guid.Empty,
+                    CreatedDate = DateTime.Now,
+                    IsDeleted = false,
+                    LikesCount = 0
+                };
+
+                _context.ForumPosts.Add(post);
+
+                // Обновляем дату последнего поста в теме и счетчик постов
+                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == actionDto.TopicId);
+                if (topic != null)
+                {
+                    topic.LastPostDate = DateTime.Now;
+                    topic.PostsCount = _context.ForumPosts.Count(p => p.TopicId == topic.Id) + 1;
+                }
+
+                SaveChanges();
+
+                return new ForumResultDto
+                {
+                    IsSuccess = true,
+                    Message = "Пост успешно создан",
+                    CreatedPostId = post.Id
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ForumResultDto
+                {
+                    IsSuccess = false,
+                    ErrorMessage = $"Ошибка создания поста: {ex.Message}"
+                };
+            }
+        }
+
+        public List<ForumPost> GetPostsByTopic(Guid topicId, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var skip = (page - 1) * pageSize;
+                return _context.ForumPosts
+                    .Where(p => p.TopicId == topicId)
+                    .OrderBy(p => p.CreatedDate)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<ForumPost>();
+            }
+        }
+
+        public bool UpdatePost(Guid postId, string content)
+        {
+            try
+            {
+                var post = _context.ForumPosts.FirstOrDefault(p => p.Id == postId);
+                if (post == null) return false;
+
+                post.Content = content;
+                SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool DeletePost(Guid postId)
+        {
+            try
+            {
+                var post = _context.ForumPosts.FirstOrDefault(p => p.Id == postId);
+                if (post == null) return false;
+
+                _context.ForumPosts.Remove(post);
+                SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public List<Category> GetAllCategories()
+        {
+            try
+            {
+                return _context.Categories.OrderBy(c => c.Name).ToList();
+            }
+            catch
+            {
+                return new List<Category>();
+            }
+        }
+
+        public Category GetCategory(Guid categoryId)
+        {
+            try
+            {
+                return _context.Categories.FirstOrDefault(c => c.Id == categoryId);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public bool CreateCategory(string name, string description)
+        {
+            try
+            {
+                var category = new Category
+                {
+                    Id = Guid.NewGuid(),
+                    Name = name,
+                    Description = description
+                };
+
+                _context.Categories.Add(category);
+                SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public int GetTopicsCount()
+        {
+            try
+            {
+                return _context.ForumTopics.Count();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public int GetPostsCount()
+        {
+            try
+            {
+                return _context.ForumPosts.Count();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public TopicDto GetLastTopic()
+        {
+            try
+            {
+                var topic = _context.ForumTopics
+                    .OrderByDescending(t => t.CreatedDate)
+                    .FirstOrDefault();
+
+                return topic != null ? MapTopicToDto(topic) : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public List<TopicDto> SearchTopics(string searchTerm, int page = 1, int pageSize = 20)
+        {
+            try
+            {
+                var skip = (page - 1) * pageSize;
+                return _context.ForumTopics
+                    .Where(t => t.Title.Contains(searchTerm) || t.Content.Contains(searchTerm))
+                    .OrderByDescending(t => t.LastPostDate)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .Select(t => MapTopicToDto(t))
+                    .Where(dto => dto != null)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<TopicDto>();
+            }
+        }
+
+        private TopicDto MapTopicToDto(ForumTopic topic)
+        {
+            if (topic == null) return null;
+
+            try
+            {
+                var author = _context.Users.FirstOrDefault(u => u.Id == topic.AuthorId);
+                var category = _context.Categories.FirstOrDefault(c => c.Id == topic.CategoryId);
+                var postsCount = _context.ForumPosts.Count(p => p.TopicId == topic.Id);
+
+                var lastPost = _context.ForumPosts
+                    .Where(p => p.TopicId == topic.Id)
+                    .OrderByDescending(p => p.CreatedDate)
+                    .FirstOrDefault();
+
+                var lastPostAuthor = lastPost != null ? 
+                    _context.Users.FirstOrDefault(u => u.Id == lastPost.AuthorId)?.Username : 
+                    author?.Username;
+
+                return new TopicDto
+                {
+                    Id = topic.Id,
+                    Title = topic.Title,
+                    Content = topic.Content,
+                    CreatedDate = topic.CreatedDate,
+                    LastPostDate = topic.LastPostDate ?? topic.CreatedDate,
+                    AuthorName = author?.Username ?? "Неизвестно",
+                    AuthorId = topic.AuthorId,
+                    CategoryName = category?.Name ?? "Без категории",
+                    CategoryId = topic.CategoryId,
+                    PostsCount = postsCount,
+                    ViewsCount = topic.ViewsCount,
+                    IsSticky = topic.IsSticky,
+                    IsLocked = topic.IsLocked,
+                    IsFeatured = topic.ViewsCount > 100,
+                    LastPostAuthor = lastPostAuthor ?? "Неизвестно"
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+} 

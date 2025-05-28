@@ -1,0 +1,618 @@
+﻿@model VinlandSaga.Web.Models.ForumTopicDetailsViewModel
+@{
+    ViewBag.Title = Model.Topic.Title;
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Forum")">
+                    <i class="fas fa-comments"></i> Форум
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Topic.Title</li>
+        </ol>
+    </nav>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Заголовок темы -->
+    <div class="topic-header-card">
+        <div class="topic-status">
+            @if (Model.Topic.IsPinned)
+            {
+                <span class="status-badge pinned">
+                    <i class="fas fa-thumbtack"></i> Закреплено
+                </span>
+            }
+            @if (Model.Topic.IsLocked)
+            {
+                <span class="status-badge locked">
+                    <i class="fas fa-lock"></i> Заблокировано
+                </span>
+            }
+        </div>
+        
+        <h1 class="topic-title">@Model.Topic.Title</h1>
+        
+        @if (!string.IsNullOrEmpty(Model.Topic.Description))
+        {
+            <p class="topic-description">@Model.Topic.Description</p>
+        }
+        
+        <div class="topic-info">
+            <div class="topic-meta">
+                <span class="author">
+                    <i class="fas fa-user"></i>
+                    Автор: <strong>@Model.Topic.AuthorName</strong>
+                </span>
+                <span class="date">
+                    <i class="fas fa-clock"></i>
+                    @Model.Topic.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                </span>
+            </div>
+            
+            <div class="topic-stats">
+                <div class="stat">
+                    <span class="stat-number">@Model.Topic.PostsCount</span>
+                    <span class="stat-label">ответов</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">@Model.Topic.ViewsCount</span>
+                    <span class="stat-label">просмотров</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сообщения -->
+    <div class="posts-container">
+        @if (Model.Posts.Any())
+        {
+            foreach (var post in Model.Posts)
+            {
+                <div class="post-card" id="post-@post.Id">
+                    <div class="post-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user-circle fa-3x"></i>
+                        </div>
+                        <div class="author-info">
+                            <h6 class="author-name">@post.AuthorName</h6>
+                            <small class="author-role">Участник</small>
+                        </div>
+                    </div>
+                    
+                    <div class="post-content">
+                        <div class="post-header">
+                            <span class="post-date">
+                                <i class="fas fa-clock"></i>
+                                @post.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                            </span>
+                            
+                            @if (post.CanEdit)
+                            {
+                                <div class="post-actions">
+                                    <a href="@Url.Action("EditPost", "Forum", new { id = post.Id })" 
+                                       class="btn btn-sm btn-edit" title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-delete" 
+                                            onclick="confirmDelete('@post.Id')" title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="post-body">
+                            @Html.Raw(Html.Encode(post.Content).Replace("\n", "<br />"))
+                        </div>
+                        
+                        @if (post.ModifiedDate.HasValue)
+                        {
+                            <div class="post-modified">
+                                <i class="fas fa-edit"></i>
+                                Отредактировано: @post.ModifiedDate.Value.ToString("dd.MM.yyyy HH:mm")
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="no-posts">
+                <i class="fas fa-comments fa-3x"></i>
+                <h4>Пока нет сообщений</h4>
+                <p>Станьте первым, кто ответит в этой теме!</p>
+            </div>
+        }
+    </div>
+
+    <!-- Пагинация -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Навигация по сообщениям" class="mt-4">
+            <ul class="pagination justify-content-center">
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Topic", new { id = Model.Topic.Id, page = Model.CurrentPage - 1 })">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                }
+
+                @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Topic", new { id = Model.Topic.Id, page = i })">@i</a>
+                    </li>
+                }
+
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Topic", new { id = Model.Topic.Id, page = Model.CurrentPage + 1 })">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+
+    <!-- Форма ответа -->
+    @if (Model.CanReply)
+    {
+        <div class="reply-form-container mt-5">
+            <h4 class="reply-title">
+                <i class="fas fa-reply"></i>
+                Ответить в теме
+            </h4>
+            
+            @using (Html.BeginForm("Reply", "Forum", FormMethod.Post, new { @class = "reply-form" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("topicId", Model.Topic.Id)
+                
+                <div class="form-group">
+                    <textarea name="content" class="form-control reply-editor" 
+                              rows="6" placeholder="Напишите ваш ответ..." required></textarea>
+                </div>
+                
+                <div class="reply-actions">
+                    <button type="submit" class="btn btn-reply">
+                        <i class="fas fa-paper-plane"></i>
+                        Отправить ответ
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    else if (!Request.IsAuthenticated)
+    {
+        <div class="login-prompt">
+            <div class="prompt-content">
+                <i class="fas fa-sign-in-alt fa-2x"></i>
+                <h5>Войдите, чтобы участвовать в обсуждении</h5>
+                <a href="@Url.Action("Login", "Account")" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </a>
+            </div>
+        </div>
+    }
+    else if (Model.Topic.IsLocked)
+    {
+        <div class="locked-prompt">
+            <div class="prompt-content">
+                <i class="fas fa-lock fa-2x"></i>
+                <h5>Тема заблокирована</h5>
+                <p>Новые ответы в этой теме запрещены.</p>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить это сообщение? Это действие нельзя отменить.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.topic-header-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.topic-status {
+    margin-bottom: 15px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.status-badge.pinned {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.locked {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.topic-title {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.topic-description {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.topic-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.topic-meta {
+    display: flex;
+    gap: 20px;
+    color: #95a5a6;
+}
+
+.topic-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.topic-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #95a5a6;
+    text-transform: uppercase;
+}
+
+.post-card {
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+    display: flex;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.post-card:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.post-author {
+    background: #f8f9fa;
+    padding: 20px;
+    min-width: 200px;
+    text-align: center;
+    border-right: 1px solid #e0e0e0;
+}
+
+.author-avatar {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.author-name {
+    color: #2c3e50;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.author-role {
+    color: #95a5a6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.post-date {
+    color: #95a5a6;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.post-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-edit {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-edit:hover {
+    background: #2980b9;
+    color: white;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background: #c0392b;
+    color: white;
+}
+
+.post-body {
+    color: #2c3e50;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.post-modified {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+    color: #95a5a6;
+    font-size: 0.9rem;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.no-posts {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    color: #95a5a6;
+}
+
+.no-posts i {
+    margin-bottom: 20px;
+}
+
+.reply-form-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.reply-title {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reply-editor {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+    min-height: 150px;
+}
+
+.reply-editor:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.reply-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.btn-reply {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-reply:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.login-prompt, .locked-prompt {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 30px;
+}
+
+.prompt-content {
+    color: #95a5a6;
+}
+
+.prompt-content i {
+    margin-bottom: 20px;
+}
+
+.prompt-content h5 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+@@media (max-width: 768px) {
+    .topic-info {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .topic-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .post-card {
+        flex-direction: column;
+    }
+    
+    .post-author {
+        min-width: auto;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .post-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+}
+</style>
+
+@section Scripts {
+    <script>
+        function confirmDelete(postId) {
+            $('#deleteForm').attr('action', '@Url.Action("DeletePost", "Forum")/' + postId);
+            $('#deleteModal').modal('show');
+        }
+        
+        $(document).ready(function() {
+            // Автоматическое изменение размера textarea
+            $('.reply-editor').on('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Плавная прокрутка к якорям
+            $('a[href^="#post-"]').on('click', function(e) {
+                e.preventDefault();
+                var target = $(this.getAttribute('href'));
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 100
+                    }, 500);
+                }
+            });
+        });
+    </script>
+} 

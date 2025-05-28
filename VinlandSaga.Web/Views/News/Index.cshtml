@@ -1,0 +1,304 @@
+﻿@model VinlandSaga.Web.Models.NewsListViewModel
+@{
+    ViewBag.Title = "Новости Vinland Saga";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-newspaper"></i> Новости Vinland Saga</h2>
+        @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+        {
+            <a href="@Url.Action("Create", "News")" class="btn btn-modern">
+                <i class="fas fa-plus"></i> Добавить новость
+            </a>
+        }
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Список новостей -->
+    @if (Model.News.Any())
+    {
+        <div class="row">
+            @foreach (var news in Model.News)
+            {
+                <div class="col-12 mb-4">
+                    <div class="news-card" onmousemove="cardParallax(event, this)">
+                        <div class="row g-0">
+                            @if (!string.IsNullOrEmpty(news.ImageUrl))
+                            {
+                                <div class="col-md-4">
+                                    <div class="news-image">
+                                        <img src="@news.ImageUrl" alt="@news.Title" class="img-fluid">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="news-content">
+                                        <div class="news-header">
+                                            <h4 class="news-title">@news.Title</h4>
+                                            <div class="news-meta">
+                                                <span class="news-date">
+                                                    <i class="fas fa-calendar"></i> @news.PublishedDate.ToString("dd.MM.yyyy")
+                                                </span>
+                                                <span class="news-views">
+                                                    <i class="fas fa-eye"></i> @news.ViewCount просмотров
+                                                </span>
+                                                @if (!news.IsPublished)
+                                                {
+                                                    <span class="badge bg-warning">Черновик</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(news.Summary))
+                                        {
+                                            <p class="news-summary">@news.Summary</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="news-summary">
+                                                @if (news.Content.Length > 200)
+                                                {
+                                                    @(news.Content.Substring(0, 200) + "...")
+                                                }
+                                                else
+                                                {
+                                                    @news.Content
+                                                }
+                                            </p>
+                                        }
+                                        
+                                        <div class="news-actions">
+                                            <a href="@Url.Action("Details", new { id = news.Id })" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Читать далее
+                                            </a>
+                                            
+                                            @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+                                            {
+                                                <a href="@Url.Action("Edit", new { id = news.Id })" class="btn btn-outline-warning">
+                                                    <i class="fas fa-edit"></i> Редактировать
+                                                </a>
+                                            }
+                                            
+                                            @if (User.IsInRole("Administrator"))
+                                            {
+                                                using (Html.BeginForm("Delete", "News", FormMethod.Post, new { @class = "d-inline" }))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    @Html.Hidden("id", news.Id)
+                                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Вы уверены, что хотите удалить эту новость?')">
+                                                        <i class="fas fa-trash"></i> Удалить
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    <div class="news-content">
+                                        <div class="news-header">
+                                            <h4 class="news-title">@news.Title</h4>
+                                            <div class="news-meta">
+                                                <span class="news-date">
+                                                    <i class="fas fa-calendar"></i> @news.PublishedDate.ToString("dd.MM.yyyy")
+                                                </span>
+                                                <span class="news-views">
+                                                    <i class="fas fa-eye"></i> @news.ViewCount просмотров
+                                                </span>
+                                                @if (!news.IsPublished)
+                                                {
+                                                    <span class="badge bg-warning">Черновик</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(news.Summary))
+                                        {
+                                            <p class="news-summary">@news.Summary</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="news-summary">
+                                                @if (news.Content.Length > 300)
+                                                {
+                                                    @(news.Content.Substring(0, 300) + "...")
+                                                }
+                                                else
+                                                {
+                                                    @news.Content
+                                                }
+                                            </p>
+                                        }
+                                        
+                                        <div class="news-actions">
+                                            <a href="@Url.Action("Details", new { id = news.Id })" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye"></i> Читать далее
+                                            </a>
+                                            
+                                            @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+                                            {
+                                                <a href="@Url.Action("Edit", new { id = news.Id })" class="btn btn-outline-warning">
+                                                    <i class="fas fa-edit"></i> Редактировать
+                                                </a>
+                                            }
+                                            
+                                            @if (User.IsInRole("Administrator"))
+                                            {
+                                                using (Html.BeginForm("Delete", "News", FormMethod.Post, new { @class = "d-inline" }))
+                                                {
+                                                    @Html.AntiForgeryToken()
+                                                    @Html.Hidden("id", news.Id)
+                                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Вы уверены, что хотите удалить эту новость?')">
+                                                        <i class="fas fa-trash"></i> Удалить
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Пагинация -->
+        if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Навигация по страницам" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1 })">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1 })">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+            <h5>Новости не найдены</h5>
+            <p class="text-muted">Новости еще не добавлены.</p>
+            @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+            {
+                <a href="@Url.Action("Create", "News")" class="btn btn-modern mt-3">
+                    <i class="fas fa-plus"></i> Добавить первую новость
+                </a>
+            }
+        </div>
+    }
+</div>
+
+<style>
+.news-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.news-image {
+    height: 200px;
+    overflow: hidden;
+}
+
+.news-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.news-card:hover .news-image img {
+    transform: scale(1.05);
+}
+
+.news-content {
+    padding: 25px;
+}
+
+.news-header {
+    margin-bottom: 15px;
+}
+
+.news-title {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.news-meta {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.news-summary {
+    color: #34495e;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.news-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+</style> 

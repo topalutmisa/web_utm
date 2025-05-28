@@ -1,0 +1,313 @@
+﻿@model VinlandSaga.Web.Models.CreateForumTopicViewModel
+@{
+    ViewBag.Title = "Создать новую тему";
+    Layout = "~/Views/Shared/_VinlandLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="create-topic-card">
+                <div class="card-header">
+                    <h2 class="create-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Создать новую тему
+                    </h2>
+                    <p class="create-subtitle">Поделитесь своими мыслями с сообществом Vinland Saga</p>
+                </div>
+                
+                <div class="card-body">
+                    @using (Html.BeginForm("CreateTopic", "Forum", FormMethod.Post, new { @class = "create-topic-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                        
+                        <div class="form-group mb-4">
+                            @Html.LabelFor(m => m.CategoryId, new { @class = "form-label" })
+                            @Html.DropDownListFor(m => m.CategoryId, ViewBag.Categories as SelectList, "Выберите категорию...", new { @class = "form-select" })
+                            @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            @Html.LabelFor(m => m.Title, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Title, new { @class = "form-control", placeholder = "Введите заголовок темы..." })
+                            @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            @Html.LabelFor(m => m.Description, new { @class = "form-label" })
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "3", placeholder = "Краткое описание темы (необязательно)..." })
+                            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            @Html.LabelFor(m => m.FirstPostContent, new { @class = "form-label" })
+                            @Html.TextAreaFor(m => m.FirstPostContent, new { @class = "form-control content-editor", rows = "8", placeholder = "Напишите ваше сообщение..." })
+                            @Html.ValidationMessageFor(m => m.FirstPostContent, "", new { @class = "text-danger" })
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Поддерживается форматирование текста. Будьте вежливы и следуйте правилам сообщества.
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-create">
+                                <i class="fas fa-paper-plane"></i>
+                                Создать тему
+                            </button>
+                            <a href="@Url.Action("Index", "Forum")" class="btn btn-cancel">
+                                <i class="fas fa-times"></i>
+                                Отмена
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <!-- Правила форума -->
+            <div class="forum-rules mt-4">
+                <h5 class="rules-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Правила форума
+                </h5>
+                <ul class="rules-list">
+                    <li>Будьте вежливы и уважительны к другим участникам</li>
+                    <li>Не используйте оскорбительные выражения</li>
+                    <li>Создавайте темы в соответствующих категориях</li>
+                    <li>Не создавайте дублирующие темы</li>
+                    <li>Используйте осмысленные заголовки</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.create-topic-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.create-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.create-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.card-body {
+    padding: 40px 30px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-label::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: white;
+}
+
+.content-editor {
+    min-height: 200px;
+    resize: vertical;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-create {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+.forum-rules {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.rules-title {
+    color: #e74c3c;
+    margin-bottom: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rules-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rules-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #34495e;
+    position: relative;
+    padding-left: 25px;
+}
+
+.rules-list li:last-child {
+    border-bottom: none;
+}
+
+.rules-list li::before {
+    content: '•';
+    color: #e74c3c;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.alert-danger {
+    border-radius: 12px;
+    border: none;
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px 20px;
+}
+
+@@media (max-width: 768px) {
+    .card-header {
+        padding: 30px 20px;
+    }
+    
+    .create-title {
+        font-size: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 30px 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-create, .btn-cancel {
+        width: 100%;
+    }
+}
+</style>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    
+    <script>
+        $(document).ready(function() {
+            // Автоматическое изменение размера textarea
+            $('.content-editor').on('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Предупреждение при попытке покинуть страницу с несохраненными данными
+            var formChanged = false;
+            $('.create-topic-form input, .create-topic-form textarea, .create-topic-form select').on('change input', function() {
+                formChanged = true;
+            });
+            
+            $('.create-topic-form').on('submit', function() {
+                formChanged = false;
+            });
+            
+            $(window).on('beforeunload', function() {
+                if (formChanged) {
+                    return 'У вас есть несохраненные изменения. Вы уверены, что хотите покинуть страницу?';
+                }
+            });
+        });
+    </script>
+} 

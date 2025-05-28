@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace VinlandSaga.Web.Models
@@ -40,5 +42,61 @@ namespace VinlandSaga.Web.Models
         [Display(Name = "Подтверждение пароля")]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string ConfirmPassword { get; set; }
+    }
+
+    public class ProfileViewModel
+    {
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string DisplayName { get; set; }
+        public string About { get; set; }
+        public string AvatarUrl { get; set; }
+        public DateTime RegistrationDate { get; set; }
+        public DateTime LastLoginDate { get; set; }
+        public bool IsEmailConfirmed { get; set; }
+    }
+
+    public class EditProfileViewModel
+    {
+        [Display(Name = "Отображаемое имя")]
+        [StringLength(100, ErrorMessage = "Отображаемое имя не может быть длиннее 100 символов")]
+        public string DisplayName { get; set; }
+
+        [Display(Name = "О себе")]
+        [StringLength(500, ErrorMessage = "Описание не может быть длиннее 500 символов")]
+        public string About { get; set; }
+
+        [Display(Name = "URL аватара")]
+        [StringLength(200, ErrorMessage = "URL аватара не может быть длиннее 200 символов")]
+        public string AvatarUrl { get; set; }
+    }
+
+    public class UserViewModel
+    {
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string DisplayName { get; set; }
+        public DateTime RegistrationDate { get; set; }
+        public DateTime LastLoginDate { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsEmailConfirmed { get; set; }
+    }
+
+    public class UsersListViewModel
+    {
+        public List<UserViewModel> Users { get; set; } = new List<UserViewModel>();
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
+        public string SearchTerm { get; set; }
+        public int TotalUsers { get; set; }
+    }
+
+    public class UserDetailsViewModel : UserViewModel
+    {
+        public string About { get; set; }
+        public string AvatarUrl { get; set; }
+        public List<string> Roles { get; set; } = new List<string>();
     }
 } 

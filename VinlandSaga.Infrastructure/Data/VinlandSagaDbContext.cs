@@ -32,8 +32,9 @@ namespace VinlandSaga.Infrastructure.Data
         public DbSet<CharacterRelationship> CharacterRelationships { get; set; }
         public DbSet<Media> Medias { get; set; }
         public DbSet<MediaCharacter> MediaCharacters { get; set; }
+        public DbSet<News> News { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-        
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             // Удаление конвенций
@@ -96,6 +97,42 @@ namespace VinlandSaga.Infrastructure.Data
                 .HasRequired(cr => cr.TargetCharacter)
                 .WithMany(c => c.TargetRelationships)
                 .HasForeignKey(cr => cr.TargetCharacterId)
+                .WillCascadeOnDelete(false);
+            
+            modelBuilder.Entity<News>()
+                .HasRequired(n => n.Author)
+                .WithMany()
+                .HasForeignKey(n => n.AuthorId)
+                .WillCascadeOnDelete(false);
+                
+            modelBuilder.Entity<News>()
+                .HasMany(n => n.Comments)
+                .WithOptional(c => c.News)
+                .HasForeignKey(c => c.NewsId);
+            
+            // Конфигурация форума
+            modelBuilder.Entity<ForumTopic>()
+                .HasRequired(ft => ft.User)
+                .WithMany()
+                .HasForeignKey(ft => ft.UserId)
+                .WillCascadeOnDelete(false);
+                
+            modelBuilder.Entity<ForumTopic>()
+                .HasRequired(ft => ft.Category)
+                .WithMany()
+                .HasForeignKey(ft => ft.CategoryId)
+                .WillCascadeOnDelete(false);
+                
+            modelBuilder.Entity<ForumPost>()
+                .HasRequired(fp => fp.User)
+                .WithMany()
+                .HasForeignKey(fp => fp.UserId)
+                .WillCascadeOnDelete(false);
+                
+            modelBuilder.Entity<ForumPost>()
+                .HasRequired(fp => fp.Topic)
+                .WithMany(ft => ft.Posts)
+                .HasForeignKey(fp => fp.TopicId)
                 .WillCascadeOnDelete(false);
             
             // Здесь добавление сид-данных с помощью Database.SetInitializer и DbInitializer

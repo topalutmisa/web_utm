@@ -11,6 +11,36 @@
         rel="stylesheet">
     <link rel="stylesheet" href="~/Content/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Отступы для основного контента */
+        .main-content {
+            padding-top: 80px; /* Отступ сверху для фиксированной навигации */
+            padding-bottom: 60px; /* Отступ снизу для футера */
+            min-height: calc(100vh - 140px); /* Минимальная высота с учетом отступов */
+        }
+        
+        /* Дополнительные отступы для страниц форума */
+        .forum-hero {
+            margin-top: 0 !important; /* Убираем отрицательный отступ */
+        }
+        
+        /* Адаптивные отступы для мобильных устройств */
+        @@media (max-width: 768px) {
+            .main-content {
+                padding-top: 70px;
+                padding-bottom: 50px;
+            }
+        }
+        
+        /* Убираем отступы для полноэкранных секций */
+        .main-content .hero-section,
+        .main-content .full-width-section {
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+        }
+    </style>
+    
     @RenderSection("styles", required: false)
 </head>
 
@@ -26,17 +56,22 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">@Html.ActionLink("Главная", "Index", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Главная", "Index", "Home", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Сюжет", "Story", "VinlandSaga", null, new { @class = "nav-link" })</li>
-                    <li class="nav-item">@Html.ActionLink("Персонажи", "Characters", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Персонажи", "Index", "Characters", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Галерея", "Gallery", "VinlandSaga", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Медиа", "Media", "VinlandSaga", null, new { @class = "nav-link" })</li>
-                    <li class="nav-item">@Html.ActionLink("Форум", "Forum", "VinlandSaga", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Форум", "Index", "Forum", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Фан-арт", "Fanart", "VinlandSaga", null, new { @class = "nav-link" })</li>
                     <li class="nav-item">@Html.ActionLink("Контакты", "Contact", "VinlandSaga", null, new { @class = "nav-link" })</li>
                     
                     @if (Request.IsAuthenticated)
                     {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Profile")">
+                                <i class="fas fa-user me-2"></i>Профиль
+                            </a>
+                        </li>
                         if (User.IsInRole("Administrator"))
                         {
                             <li class="nav-item">
@@ -68,7 +103,10 @@
         </div>
     </nav>
     
-    @RenderBody()
+    <!-- Основной контент с отступами -->
+    <main class="main-content">
+        @RenderBody()
+    </main>
 
     @Html.Partial("Partials/_Footer")
 
