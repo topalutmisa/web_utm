@@ -69,7 +69,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.Characters
+                var allCharacters = GetAll<Character>();
+                return allCharacters
                     .Where(c => c.Name.Contains(searchTerm) || 
                                c.Description.Contains(searchTerm) ||
                                c.Clan.Contains(searchTerm))
@@ -88,7 +89,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.Characters
+                var allCharacters = GetAll<Character>();
+                return allCharacters
                     .Where(c => c.Clan == clan)
                     .OrderBy(c => c.Name)
                     .Select(c => MapToDto(c))
@@ -105,7 +107,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.Characters
+                var allCharacters = GetAll<Character>();
+                return allCharacters
                     .Where(c => c.Status == status)
                     .OrderBy(c => c.Name)
                     .Select(c => MapToDto(c))
@@ -122,13 +125,16 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var relatedIds = _context.CharacterRelationships
+                // Получаем все связи через базовый метод
+                var allRelationships = GetAll<CharacterRelationship>();
+                var relatedIds = allRelationships
                     .Where(cr => cr.CharacterId1 == characterId || cr.CharacterId2Id == characterId)
                     .Select(cr => cr.CharacterId1 == characterId ? cr.CharacterId2Id : cr.CharacterId1)
                     .Distinct()
                     .ToList();
 
-                return _context.Characters
+                var allCharacters = GetAll<Character>();
+                return allCharacters
                     .Where(c => relatedIds.Contains(c.Id))
                     .OrderBy(c => c.Name)
                     .Select(c => MapToDto(c))
@@ -167,15 +173,14 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var relationship = _context.CharacterRelationships
+                var allRelationships = GetAll<CharacterRelationship>();
+                var relationship = allRelationships
                     .FirstOrDefault(cr => (cr.CharacterId1 == character1Id && cr.CharacterId2Id == character2Id) ||
                                          (cr.CharacterId1 == character2Id && cr.CharacterId2Id == character1Id));
                 
                 if (relationship == null) return false;
 
-                _context.CharacterRelationships.Remove(relationship);
-                SaveChanges();
-                return true;
+                return Delete<CharacterRelationship>(relationship.Id);
             }
             catch
             {
@@ -192,16 +197,14 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allCharacters = GetAll<Character>();
                 // Простая логика - берем первых персонажей
-                var featuredIds = _context.Characters
+                var featuredCharacters = allCharacters
                     .OrderBy(c => c.Name)
                     .Take(count)
-                    .Select(c => c.Id)
                     .ToList();
 
-                return _context.Characters
-                    .Where(c => featuredIds.Contains(c.Id))
-                    .OrderBy(c => c.Name)
+                return featuredCharacters
                     .Select(c => MapToDto(c))
                     .Where(dto => dto != null)
                     .ToList();
@@ -216,7 +219,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.Characters
+                var allCharacters = GetAll<Character>();
+                return allCharacters
                     .OrderByDescending(c => c.Id) // Предполагаем, что новые ID больше
                     .Take(count)
                     .Select(c => MapToDto(c))
@@ -235,8 +239,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
             try
             {
-                // Получаем связи персонажа
-                var relationships = _context.CharacterRelationships
+                // Получаем связи персонажа через базовый метод
+                var allRelationships = GetAll<CharacterRelationship>();
+                var relationships = allRelationships
                     .Where(cr => cr.CharacterId1 == character.Id || cr.CharacterId2Id == character.Id)
                     .Select(cr => cr.RelationType)
                     .Distinct()

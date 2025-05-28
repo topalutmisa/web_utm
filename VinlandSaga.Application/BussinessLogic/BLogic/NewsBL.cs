@@ -88,8 +88,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allNews = GetAll<News>();
                 var skip = (page - 1) * pageSize;
-                return _context.News
+                return allNews
                     .Where(n => n.IsPublished)
                     .OrderByDescending(n => n.PublishDate)
                     .Skip(skip)
@@ -108,8 +109,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allNews = GetAll<News>();
                 var skip = (page - 1) * pageSize;
-                return _context.News
+                return allNews
                     .Where(n => !n.IsPublished)
                     .OrderByDescending(n => n.PublishDate)
                     .Skip(skip)
@@ -128,7 +130,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.News
+                var allNews = GetAll<News>();
+                return allNews
                     .Where(n => n.IsPublished && n.IsFeatured)
                     .OrderByDescending(n => n.PublishDate)
                     .Take(count)
@@ -160,7 +163,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.News.Count(n => n.IsPublished);
+                var allNews = GetAll<News>();
+                return allNews.Count(n => n.IsPublished);
             }
             catch
             {
@@ -172,7 +176,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var news = _context.News
+                var allNews = GetAll<News>();
+                var news = allNews
                     .Where(n => n.IsPublished)
                     .OrderByDescending(n => n.PublishDate)
                     .FirstOrDefault();
@@ -189,7 +194,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.News
+                var allNews = GetAll<News>();
+                return allNews
                     .Where(n => n.IsPublished)
                     .OrderByDescending(n => n.PublishDate)
                     .Take(count)
@@ -207,8 +213,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allNews = GetAll<News>();
                 var skip = (page - 1) * pageSize;
-                return _context.News
+                return allNews
                     .Where(n => n.IsPublished && 
                                (n.Title.Contains(searchTerm) || 
                                 n.Content.Contains(searchTerm) ||
@@ -230,8 +237,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allNews = GetAll<News>();
                 var skip = (page - 1) * pageSize;
-                return _context.News
+                return allNews
                     .Where(n => n.AuthorId == authorId)
                     .OrderByDescending(n => n.PublishDate)
                     .Skip(skip)
@@ -260,7 +268,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.News
+                var allNews = GetAll<News>();
+                return allNews
                     .Where(n => n.IsPublished)
                     .OrderByDescending(n => n.ViewsCount)
                     .Take(count)
@@ -280,7 +289,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
             try
             {
-                var author = _context.Users.FirstOrDefault(u => u.Id == news.AuthorId);
+                var allUsers = GetAll<User>();
+                var author = allUsers.FirstOrDefault(u => u.Id == news.AuthorId);
 
                 return new NewsDto
                 {

@@ -62,8 +62,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allTopics = GetAll<ForumTopic>();
                 var skip = (page - 1) * pageSize;
-                return _context.ForumTopics
+                return allTopics
                     .Where(t => t.CategoryId == categoryId)
                     .OrderByDescending(t => t.IsSticky)
                     .ThenByDescending(t => t.LastPostDate)
@@ -83,7 +84,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.ForumTopics
+                var allTopics = GetAll<ForumTopic>();
+                return allTopics
                     .OrderByDescending(t => t.CreatedDate)
                     .Take(count)
                     .Select(t => MapTopicToDto(t))
@@ -100,7 +102,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.ForumTopics
+                var allTopics = GetAll<ForumTopic>();
+                return allTopics
                     .Where(t => t.IsSticky || t.ViewsCount > 100) // Критерии для рекомендуемых
                     .OrderByDescending(t => t.ViewsCount)
                     .Take(count)
@@ -138,9 +141,14 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                // Удаляем все посты в теме
-                var posts = _context.ForumPosts.Where(p => p.TopicId == topicId).ToList();
-                _context.ForumPosts.RemoveRange(posts);
+                // Удаляем все посты в теме через базовые методы
+                var allPosts = GetAll<ForumPost>();
+                var postsToDelete = allPosts.Where(p => p.TopicId == topicId).ToList();
+                
+                foreach (var post in postsToDelete)
+                {
+                    Delete<ForumPost>(post.Id);
+                }
 
                 return Delete<ForumTopic>(topicId);
             }
@@ -181,7 +189,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                 if (topic != null)
                 {
                     topic.LastPostDate = DateTime.Now;
-                    topic.PostsCount = _context.ForumPosts.Count(p => p.TopicId == topic.Id);
+                    var allPosts = GetAll<ForumPost>();
+                    topic.PostsCount = allPosts.Count(p => p.TopicId == topic.Id);
                     Update(topic);
                 }
 
@@ -206,8 +215,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allPosts = GetAll<ForumPost>();
                 var skip = (page - 1) * pageSize;
-                return _context.ForumPosts
+                return allPosts
                     .Where(p => p.TopicId == topicId)
                     .OrderBy(p => p.CreatedDate)
                     .Skip(skip)
@@ -277,7 +287,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var topic = _context.ForumTopics
+                var allTopics = GetAll<ForumTopic>();
+                var topic = allTopics
                     .OrderByDescending(t => t.CreatedDate)
                     .FirstOrDefault();
 
@@ -293,8 +304,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allTopics = GetAll<ForumTopic>();
                 var skip = (page - 1) * pageSize;
-                return _context.ForumTopics
+                return allTopics
                     .Where(t => t.Title.Contains(searchTerm) || t.Content.Contains(searchTerm))
                     .OrderByDescending(t => t.LastPostDate)
                     .Skip(skip)
@@ -315,17 +327,21 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
             try
             {
-                var author = _context.Users.FirstOrDefault(u => u.Id == topic.AuthorId);
-                var category = _context.Categories.FirstOrDefault(c => c.Id == topic.CategoryId);
-                var postsCount = _context.ForumPosts.Count(p => p.TopicId == topic.Id);
+                var allUsers = GetAll<User>();
+                var allCategories = GetAll<Category>();
+                var allPosts = GetAll<ForumPost>();
+                
+                var author = allUsers.FirstOrDefault(u => u.Id == topic.AuthorId);
+                var category = allCategories.FirstOrDefault(c => c.Id == topic.CategoryId);
+                var postsCount = allPosts.Count(p => p.TopicId == topic.Id);
 
-                var lastPost = _context.ForumPosts
+                var lastPost = allPosts
                     .Where(p => p.TopicId == topic.Id)
                     .OrderByDescending(p => p.CreatedDate)
                     .FirstOrDefault();
 
                 var lastPostAuthor = lastPost != null ? 
-                    _context.Users.FirstOrDefault(u => u.Id == lastPost.AuthorId)?.Username : 
+                    allUsers.FirstOrDefault(u => u.Id == lastPost.AuthorId)?.Username : 
                     author?.Username;
 
                 return new TopicDto

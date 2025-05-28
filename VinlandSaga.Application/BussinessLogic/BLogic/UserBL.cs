@@ -16,7 +16,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Email == email && u.IsActive);
+                var allUsers = GetAll<User>();
+                var user = allUsers.FirstOrDefault(u => u.Email == email && u.IsActive);
                 if (user == null)
                 {
                     return new AuthResultDto
@@ -60,7 +61,7 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
                 // Обновление даты последнего входа
                 user.LastLoginDate = DateTime.Now;
-                SaveChanges();
+                Update(user);
 
                 return new AuthResultDto
                 {
@@ -85,8 +86,10 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allUsers = GetAll<User>();
+                
                 // Проверка существования пользователя
-                if (_context.Users.Any(u => u.Email == email))
+                if (allUsers.Any(u => u.Email == email))
                 {
                     return new AuthResultDto
                     {
@@ -95,7 +98,7 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                     };
                 }
 
-                if (_context.Users.Any(u => u.Username == username))
+                if (allUsers.Any(u => u.Username == username))
                 {
                     return new AuthResultDto
                     {
@@ -118,21 +121,28 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                     IsEmailConfirmed = false
                 };
 
-                _context.Users.Add(user);
+                var userCreated = Create(user);
+                if (!userCreated)
+                {
+                    return new AuthResultDto
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Ошибка создания пользователя"
+                    };
+                }
 
                 // Назначение роли по умолчанию
-                var userRole = _context.Roles.FirstOrDefault(r => r.Name == "User");
+                var allRoles = GetAll<Role>();
+                var userRole = allRoles.FirstOrDefault(r => r.Name == "User");
                 if (userRole != null)
                 {
-                    _context.UserRoles.Add(new UserRole
+                    Create(new UserRole
                     {
                         Id = Guid.NewGuid(),
                         UserId = user.Id,
                         RoleId = userRole.Id
                     });
                 }
-
-                SaveChanges();
 
                 return new AuthResultDto
                 {
@@ -188,8 +198,11 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
             try
             {
                 var roles = GetUserRoles(userId);
-                var postsCount = _context.ForumPosts.Count(p => p.AuthorId == userId);
-                var topicsCount = _context.ForumTopics.Count(t => t.AuthorId == userId);
+                var allPosts = GetAll<ForumPost>();
+                var allTopics = GetAll<ForumTopic>();
+                
+                var postsCount = allPosts.Count(p => p.AuthorId == userId);
+                var topicsCount = allTopics.Count(t => t.AuthorId == userId);
 
                 return new UserProfileDto
                 {
@@ -216,7 +229,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Username == username);
+                var allUsers = GetAll<User>();
+                var user = allUsers.FirstOrDefault(u => u.Username == username);
                 return user != null ? GetUserProfile(user.Id) : null;
             }
             catch
@@ -264,9 +278,17 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.UserRoles
+                var allUserRoles = GetAll<UserRole>();
+                var allRoles = GetAll<Role>();
+                
+                var userRoleIds = allUserRoles
                     .Where(ur => ur.UserId == userId)
-                    .Join(_context.Roles, ur => ur.RoleId, r => r.Id, (ur, r) => r.Name)
+                    .Select(ur => ur.RoleId)
+                    .ToList();
+                
+                return allRoles
+                    .Where(r => userRoleIds.Contains(r.Id))
+                    .Select(r => r.Name)
                     .ToArray();
             }
             catch
@@ -309,15 +331,15 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var role = _context.Roles.FirstOrDefault(r => r.Name == roleName);
+                var allRoles = GetAll<Role>();
+                var role = allRoles.FirstOrDefault(r => r.Name == roleName);
                 if (role == null) return false;
 
-                var userRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == userId && ur.RoleId == role.Id);
+                var allUserRoles = GetAll<UserRole>();
+                var userRole = allUserRoles.FirstOrDefault(ur => ur.UserId == userId && ur.RoleId == role.Id);
                 if (userRole == null) return true; // Уже нет
 
-                _context.UserRoles.Remove(userRole);
-                SaveChanges();
-                return true;
+                return Delete<UserRole>(userRole.Id);
             }
             catch
             {
@@ -329,7 +351,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.Users
+                var allUsers = GetAll<User>();
+                return allUsers
                     .Where(u => u.IsActive)
                     .OrderByDescending(u => u.RegistrationDate)
                     .Take(count)
@@ -347,7 +370,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                return _context.Users
+                var allUsers = GetAll<User>();
+                return allUsers
                     .Where(u => u.IsActive)
                     .OrderByDescending(u => u.LastLoginDate)
                     .Take(count)
@@ -370,8 +394,9 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
+                var allUsers = GetAll<User>();
                 var skip = (page - 1) * pageSize;
-                return _context.Users
+                return allUsers
                     .Where(u => u.IsActive && 
                                (u.Username.Contains(searchTerm) || 
                                 u.DisplayName.Contains(searchTerm) ||
