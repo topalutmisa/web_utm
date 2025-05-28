@@ -10,11 +10,13 @@ namespace VinlandSaga.Domain.DTOs
         public string Summary { get; set; }
         public string ImageUrl { get; set; }
         public DateTime PublishDate { get; set; }
+        public DateTime PublishedDate { get; set; }
         public string AuthorName { get; set; }
         public Guid AuthorId { get; set; }
         public bool IsPublished { get; set; }
         public bool IsFeatured { get; set; }
         public int ViewsCount { get; set; }
+        public int ViewCount { get; set; }
         public string[] Tags { get; set; }
     }
 } 

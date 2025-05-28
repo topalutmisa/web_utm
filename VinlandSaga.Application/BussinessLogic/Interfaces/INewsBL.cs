@@ -28,6 +28,7 @@ namespace VinlandSaga.Application.BussinessLogic.Interfaces
         int GetNewsCount();
         int GetPublishedNewsCount();
         NewsDto GetLatestNews();
+        List<NewsDto> GetLatestNews(int count);
         
         // Поиск
         List<NewsDto> SearchNews(string searchTerm, int page = 1, int pageSize = 20);

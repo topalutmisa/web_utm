@@ -12,102 +12,57 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
     {
         public CharacterDto GetCharacter(Guid characterId)
         {
-            try
-            {
-                var character = _context.Characters.FirstOrDefault(c => c.Id == characterId);
-                if (character == null) return null;
-
-                return MapToDto(character);
-            }
-            catch
-            {
-                return null;
-            }
+            var character = GetById<Character>(characterId);
+            return character != null ? MapToDto(character) : null;
         }
 
         public List<CharacterDto> GetAllCharacters()
         {
-            try
-            {
-                return _context.Characters
-                    .OrderBy(c => c.Name)
-                    .Select(c => MapToDto(c))
-                    .Where(dto => dto != null)
-                    .ToList();
-            }
-            catch
-            {
-                return new List<CharacterDto>();
-            }
+            var characters = GetAll<Character>();
+            return characters.OrderBy(c => c.Name)
+                           .Select(c => MapToDto(c))
+                           .Where(dto => dto != null)
+                           .ToList();
         }
 
         public bool CreateCharacter(CharacterDto characterDto)
         {
-            try
+            var character = new Character
             {
-                var character = new Character
-                {
-                    Id = Guid.NewGuid(),
-                    Name = characterDto.Name,
-                    Description = characterDto.Description,
-                    ImageUrl = characterDto.ImageUrl,
-                    Clan = characterDto.Clan,
-                    Status = characterDto.Status,
-                    Occupation = characterDto.Occupation,
-                    BirthDate = characterDto.BirthDate,
-                    DeathDate = characterDto.DeathDate
-                };
+                Id = Guid.NewGuid(),
+                Name = characterDto.Name,
+                Description = characterDto.Description,
+                ImageUrl = characterDto.ImageUrl,
+                Clan = characterDto.Clan,
+                Status = characterDto.Status,
+                Occupation = characterDto.Occupation,
+                BirthDate = characterDto.BirthDate,
+                DeathDate = characterDto.DeathDate
+            };
 
-                _context.Characters.Add(character);
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Create(character);
         }
 
         public bool UpdateCharacter(CharacterDto characterDto)
         {
-            try
-            {
-                var character = _context.Characters.FirstOrDefault(c => c.Id == characterDto.Id);
-                if (character == null) return false;
+            var character = GetById<Character>(characterDto.Id);
+            if (character == null) return false;
 
-                character.Name = characterDto.Name;
-                character.Description = characterDto.Description;
-                character.ImageUrl = characterDto.ImageUrl;
-                character.Clan = characterDto.Clan;
-                character.Status = characterDto.Status;
-                character.Occupation = characterDto.Occupation;
-                character.BirthDate = characterDto.BirthDate;
-                character.DeathDate = characterDto.DeathDate;
+            character.Name = characterDto.Name;
+            character.Description = characterDto.Description;
+            character.ImageUrl = characterDto.ImageUrl;
+            character.Clan = characterDto.Clan;
+            character.Status = characterDto.Status;
+            character.Occupation = characterDto.Occupation;
+            character.BirthDate = characterDto.BirthDate;
+            character.DeathDate = characterDto.DeathDate;
 
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Update(character);
         }
 
         public bool DeleteCharacter(Guid characterId)
         {
-            try
-            {
-                var character = _context.Characters.FirstOrDefault(c => c.Id == characterId);
-                if (character == null) return false;
-
-                _context.Characters.Remove(character);
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Delete<Character>(characterId);
         }
 
         public List<CharacterDto> SearchCharacters(string searchTerm)
@@ -190,14 +145,6 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                // Проверяем, что связь не существует
-                if (_context.CharacterRelationships.Any(cr => 
-                    (cr.CharacterId1 == character1Id && cr.CharacterId2Id == character2Id) ||
-                    (cr.CharacterId1 == character2Id && cr.CharacterId2Id == character1Id)))
-                {
-                    return true; // Уже существует
-                }
-
                 var relationship = new CharacterRelationship
                 {
                     Id = Guid.NewGuid(),
@@ -208,9 +155,7 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                     RelationType = relationshipType
                 };
 
-                _context.CharacterRelationships.Add(relationship);
-                SaveChanges();
-                return true;
+                return Create(relationship);
             }
             catch
             {
@@ -222,11 +167,11 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var relationship = _context.CharacterRelationships.FirstOrDefault(cr =>
-                    (cr.CharacterId1 == character1Id && cr.CharacterId2Id == character2Id) ||
-                    (cr.CharacterId1 == character2Id && cr.CharacterId2Id == character1Id));
-
-                if (relationship == null) return true; // Уже нет
+                var relationship = _context.CharacterRelationships
+                    .FirstOrDefault(cr => (cr.CharacterId1 == character1Id && cr.CharacterId2Id == character2Id) ||
+                                         (cr.CharacterId1 == character2Id && cr.CharacterId2Id == character1Id));
+                
+                if (relationship == null) return false;
 
                 _context.CharacterRelationships.Remove(relationship);
                 SaveChanges();
@@ -240,26 +185,18 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public int GetCharactersCount()
         {
-            try
-            {
-                return _context.Characters.Count();
-            }
-            catch
-            {
-                return 0;
-            }
+            return Count<Character>();
         }
 
         public List<CharacterDto> GetFeaturedCharacters(int count = 5)
         {
             try
             {
-                // Возвращаем персонажей с наибольшим количеством связей
-                var featuredIds = _context.CharacterRelationships
-                    .GroupBy(cr => cr.CharacterId1)
-                    .OrderByDescending(g => g.Count())
+                // Простая логика - берем первых персонажей
+                var featuredIds = _context.Characters
+                    .OrderBy(c => c.Name)
                     .Take(count)
-                    .Select(g => g.Key)
+                    .Select(c => c.Id)
                     .ToList();
 
                 return _context.Characters
@@ -311,13 +248,13 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                     Name = character.Name,
                     Description = character.Description,
                     ImageUrl = character.ImageUrl,
-                    Clan = character.Clan,
-                    Status = character.Status,
+                    Age = character.Age,
                     Occupation = character.Occupation,
+                    Status = character.Status,
+                    Clan = character.Clan,
                     BirthDate = character.BirthDate,
                     DeathDate = character.DeathDate,
-                    Relationships = relationships,
-                    Appearances = new List<string>() // Можно расширить позже
+                    Relationships = relationships
                 };
             }
             catch

@@ -12,141 +12,76 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
     {
         public NewsDto GetNews(Guid newsId)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsId);
-                if (news == null) return null;
-
-                return MapToDto(news);
-            }
-            catch
-            {
-                return null;
-            }
+            var news = GetById<News>(newsId);
+            return news != null ? MapToDto(news) : null;
         }
 
         public List<NewsDto> GetAllNews(int page = 1, int pageSize = 20)
         {
-            try
-            {
-                var skip = (page - 1) * pageSize;
-                return _context.News
-                    .OrderByDescending(n => n.PublishDate)
-                    .Skip(skip)
-                    .Take(pageSize)
-                    .Select(n => MapToDto(n))
-                    .Where(dto => dto != null)
-                    .ToList();
-            }
-            catch
-            {
-                return new List<NewsDto>();
-            }
+            var allNews = GetPaged<News>(page, pageSize);
+            return allNews.OrderByDescending(n => n.PublishDate)
+                         .Select(n => MapToDto(n))
+                         .Where(dto => dto != null)
+                         .ToList();
         }
 
         public bool CreateNews(NewsDto newsDto)
         {
-            try
+            var news = new News
             {
-                var news = new News
-                {
-                    Id = Guid.NewGuid(),
-                    Title = newsDto.Title,
-                    Content = newsDto.Content,
-                    Summary = newsDto.Summary,
-                    ImageUrl = newsDto.ImageUrl,
-                    AuthorId = newsDto.AuthorId,
-                    PublishedDate = DateTime.Now,
-                    PublishDate = DateTime.Now,
-                    IsPublished = newsDto.IsPublished,
-                    IsFeatured = false,
-                    ViewCount = 0,
-                    ViewsCount = 0
-                };
+                Id = Guid.NewGuid(),
+                Title = newsDto.Title,
+                Content = newsDto.Content,
+                Summary = newsDto.Summary,
+                AuthorId = newsDto.AuthorId,
+                PublishedDate = DateTime.Now,
+                PublishDate = DateTime.Now,
+                IsPublished = false,
+                IsFeatured = false,
+                ViewCount = 0,
+                ViewsCount = 0
+            };
 
-                _context.News.Add(news);
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Create(news);
         }
 
         public bool UpdateNews(NewsDto newsDto)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsDto.Id);
-                if (news == null) return false;
+            var news = GetById<News>(newsDto.Id);
+            if (news == null) return false;
 
-                news.Title = newsDto.Title;
-                news.Content = newsDto.Content;
-                news.Summary = newsDto.Summary;
-                news.ImageUrl = newsDto.ImageUrl;
-                news.IsFeatured = newsDto.IsFeatured;
+            news.Title = newsDto.Title;
+            news.Content = newsDto.Content;
+            news.Summary = newsDto.Summary;
+            news.IsFeatured = newsDto.IsFeatured;
 
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Update(news);
         }
 
         public bool DeleteNews(Guid newsId)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsId);
-                if (news == null) return false;
-
-                _context.News.Remove(news);
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Delete<News>(newsId);
         }
 
         public bool PublishNews(Guid newsId)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsId);
-                if (news == null) return false;
+            var news = GetById<News>(newsId);
+            if (news == null) return false;
 
-                news.IsPublished = true;
-                news.PublishedDate = DateTime.Now;
-                news.PublishDate = DateTime.Now;
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            news.IsPublished = true;
+            news.PublishedDate = DateTime.Now;
+            news.PublishDate = DateTime.Now;
+            
+            return Update(news);
         }
 
         public bool UnpublishNews(Guid newsId)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsId);
-                if (news == null) return false;
+            var news = GetById<News>(newsId);
+            if (news == null) return false;
 
-                news.IsPublished = false;
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            news.IsPublished = false;
+            return Update(news);
         }
 
         public List<NewsDto> GetPublishedNews(int page = 1, int pageSize = 20)
@@ -209,31 +144,16 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool SetNewsFeatured(Guid newsId, bool isFeatured)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsId);
-                if (news == null) return false;
+            var news = GetById<News>(newsId);
+            if (news == null) return false;
 
-                news.IsFeatured = isFeatured;
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            news.IsFeatured = isFeatured;
+            return Update(news);
         }
 
         public int GetNewsCount()
         {
-            try
-            {
-                return _context.News.Count();
-            }
-            catch
-            {
-                return 0;
-            }
+            return Count<News>();
         }
 
         public int GetPublishedNewsCount()
@@ -262,6 +182,24 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
             catch
             {
                 return null;
+            }
+        }
+
+        public List<NewsDto> GetLatestNews(int count)
+        {
+            try
+            {
+                return _context.News
+                    .Where(n => n.IsPublished)
+                    .OrderByDescending(n => n.PublishDate)
+                    .Take(count)
+                    .Select(n => MapToDto(n))
+                    .Where(dto => dto != null)
+                    .ToList();
+            }
+            catch
+            {
+                return new List<NewsDto>();
             }
         }
 
@@ -310,19 +248,12 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool IncrementViewCount(Guid newsId)
         {
-            try
-            {
-                var news = _context.News.FirstOrDefault(n => n.Id == newsId);
-                if (news == null) return false;
+            var news = GetById<News>(newsId);
+            if (news == null) return false;
 
-                news.ViewsCount++;
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            news.ViewsCount++;
+            news.ViewCount++;
+            return Update(news);
         }
 
         public List<NewsDto> GetMostViewedNews(int count = 10)
@@ -357,14 +288,14 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                     Title = news.Title,
                     Content = news.Content,
                     Summary = news.Summary,
-                    ImageUrl = news.ImageUrl,
-                    PublishDate = news.PublishDate,
-                    AuthorName = author?.Username ?? "Неизвестно",
                     AuthorId = news.AuthorId,
+                    AuthorName = author?.DisplayName ?? author?.Username ?? "Неизвестный автор",
+                    PublishedDate = news.PublishedDate,
+                    PublishDate = news.PublishDate,
                     IsPublished = news.IsPublished,
                     IsFeatured = news.IsFeatured,
-                    ViewsCount = news.ViewsCount,
-                    Tags = new string[0] // Можно расширить позже
+                    ViewCount = news.ViewCount,
+                    ViewsCount = news.ViewsCount
                 };
             }
             catch

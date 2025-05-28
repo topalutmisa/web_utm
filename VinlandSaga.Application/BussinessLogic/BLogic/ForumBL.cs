@@ -54,17 +54,8 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public TopicDto GetTopic(Guid topicId)
         {
-            try
-            {
-                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == topicId);
-                if (topic == null) return null;
-
-                return MapTopicToDto(topic);
-            }
-            catch
-            {
-                return null;
-            }
+            var topic = GetById<ForumTopic>(topicId);
+            return topic != null ? MapTopicToDto(topic) : null;
         }
 
         public List<TopicDto> GetTopicsByCategory(Guid categoryId, int page = 1, int pageSize = 20)
@@ -125,18 +116,17 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool UpdateTopic(TopicDto topicDto)
         {
+            var topic = GetById<ForumTopic>(topicDto.Id);
+            if (topic == null) return false;
+
             try
             {
-                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == topicDto.Id);
-                if (topic == null) return false;
-
                 topic.Title = topicDto.Title;
                 topic.Content = topicDto.Content;
                 topic.IsSticky = topicDto.IsSticky;
                 topic.IsLocked = topicDto.IsLocked;
 
-                SaveChanges();
-                return true;
+                return Update(topic);
             }
             catch
             {
@@ -148,16 +138,11 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
         {
             try
             {
-                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == topicId);
-                if (topic == null) return false;
-
                 // Удаляем все посты в теме
                 var posts = _context.ForumPosts.Where(p => p.TopicId == topicId).ToList();
                 _context.ForumPosts.RemoveRange(posts);
 
-                _context.ForumTopics.Remove(topic);
-                SaveChanges();
-                return true;
+                return Delete<ForumTopic>(topicId);
             }
             catch
             {
@@ -181,17 +166,24 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                     LikesCount = 0
                 };
 
-                _context.ForumPosts.Add(post);
+                var success = Create(post);
+                if (!success) 
+                {
+                    return new ForumResultDto
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "Ошибка создания поста"
+                    };
+                }
 
                 // Обновляем дату последнего поста в теме и счетчик постов
-                var topic = _context.ForumTopics.FirstOrDefault(t => t.Id == actionDto.TopicId);
+                var topic = GetById<ForumTopic>(actionDto.TopicId ?? Guid.Empty);
                 if (topic != null)
                 {
                     topic.LastPostDate = DateTime.Now;
-                    topic.PostsCount = _context.ForumPosts.Count(p => p.TopicId == topic.Id) + 1;
+                    topic.PostsCount = _context.ForumPosts.Count(p => p.TopicId == topic.Id);
+                    Update(topic);
                 }
-
-                SaveChanges();
 
                 return new ForumResultDto
                 {
@@ -230,14 +222,13 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool UpdatePost(Guid postId, string content)
         {
+            var post = GetById<ForumPost>(postId);
+            if (post == null) return false;
+
             try
             {
-                var post = _context.ForumPosts.FirstOrDefault(p => p.Id == postId);
-                if (post == null) return false;
-
                 post.Content = content;
-                SaveChanges();
-                return true;
+                return Update(post);
             }
             catch
             {
@@ -247,88 +238,39 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool DeletePost(Guid postId)
         {
-            try
-            {
-                var post = _context.ForumPosts.FirstOrDefault(p => p.Id == postId);
-                if (post == null) return false;
-
-                _context.ForumPosts.Remove(post);
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Delete<ForumPost>(postId);
         }
 
         public List<Category> GetAllCategories()
         {
-            try
-            {
-                return _context.Categories.OrderBy(c => c.Name).ToList();
-            }
-            catch
-            {
-                return new List<Category>();
-            }
+            return GetAll<Category>().OrderBy(c => c.Name).ToList();
         }
 
         public Category GetCategory(Guid categoryId)
         {
-            try
-            {
-                return _context.Categories.FirstOrDefault(c => c.Id == categoryId);
-            }
-            catch
-            {
-                return null;
-            }
+            return GetById<Category>(categoryId);
         }
 
         public bool CreateCategory(string name, string description)
         {
-            try
+            var category = new Category
             {
-                var category = new Category
-                {
-                    Id = Guid.NewGuid(),
-                    Name = name,
-                    Description = description
-                };
+                Id = Guid.NewGuid(),
+                Name = name,
+                Description = description
+            };
 
-                _context.Categories.Add(category);
-                SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return Create(category);
         }
 
         public int GetTopicsCount()
         {
-            try
-            {
-                return _context.ForumTopics.Count();
-            }
-            catch
-            {
-                return 0;
-            }
+            return Count<ForumTopic>();
         }
 
         public int GetPostsCount()
         {
-            try
-            {
-                return _context.ForumPosts.Count();
-            }
-            catch
-            {
-                return 0;
-            }
+            return Count<ForumPost>();
         }
 
         public TopicDto GetLastTopic()

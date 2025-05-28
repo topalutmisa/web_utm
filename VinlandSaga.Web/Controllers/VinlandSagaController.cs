@@ -3,15 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using VinlandSaga.Application.BussinessLogic;
+using VinlandSaga.Application.BussinessLogic.Interfaces;
 
 namespace VinlandSaga.Web.Controllers
 {
-    public class VinlandSagaController : Controller
+    public class HomeController : Controller
     {
+        private readonly INewsBL _newsBL;
+        private readonly ICharacterBL _characterBL;
+        private readonly IForumBL _forumBL;
+
+        public HomeController()
+        {
+            var factory = BusinessLogicFactory.Instance;
+            _newsBL = factory.GetNewsBL();
+            _characterBL = factory.GetCharacterBL();
+            _forumBL = factory.GetForumBL();
+        }
         
         public ActionResult Index()
         {
-            ViewBag.Title = "Сага";
+            ViewBag.Title = "Главная";
+            
+            // Получаем данные для главной страницы через Business Logic
+            ViewBag.LatestNews = _newsBL.GetLatestNews(3);
+            ViewBag.FeaturedCharacters = _characterBL.GetFeaturedCharacters(4);
+            ViewBag.RecentTopics = _forumBL.GetRecentTopics(5);
+            
             return View();
         }
 

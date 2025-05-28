@@ -182,11 +182,11 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public UserProfileDto GetUserProfile(Guid userId)
         {
+            var user = GetById<User>(userId);
+            if (user == null) return null;
+
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-                if (user == null) return null;
-
                 var roles = GetUserRoles(userId);
                 var postsCount = _context.ForumPosts.Count(p => p.AuthorId == userId);
                 var topicsCount = _context.ForumTopics.Count(t => t.AuthorId == userId);
@@ -227,17 +227,16 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool UpdateUserProfile(UserProfileDto userDto)
         {
+            var user = GetById<User>(userDto.Id);
+            if (user == null) return false;
+
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == userDto.Id);
-                if (user == null) return false;
-
                 user.DisplayName = userDto.DisplayName;
                 user.About = userDto.About;
                 user.AvatarUrl = userDto.AvatarUrl;
 
-                SaveChanges();
-                return true;
+                return Update(user);
             }
             catch
             {
@@ -247,14 +246,13 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public bool DeleteUser(Guid userId)
         {
+            var user = GetById<User>(userId);
+            if (user == null) return false;
+
             try
             {
-                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-                if (user == null) return false;
-
                 user.IsActive = false;
-                SaveChanges();
-                return true;
+                return Update(user);
             }
             catch
             {
@@ -292,15 +290,14 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
                 if (_context.UserRoles.Any(ur => ur.UserId == userId && ur.RoleId == role.Id))
                     return true; // Уже есть
 
-                _context.UserRoles.Add(new UserRole
+                var userRole = new UserRole
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
                     RoleId = role.Id
-                });
+                };
 
-                SaveChanges();
-                return true;
+                return Create(userRole);
             }
             catch
             {
@@ -366,14 +363,7 @@ namespace VinlandSaga.Application.BussinessLogic.BLogic
 
         public int GetTotalUsersCount()
         {
-            try
-            {
-                return _context.Users.Count(u => u.IsActive);
-            }
-            catch
-            {
-                return 0;
-            }
+            return Count<User>();
         }
 
         public List<UserProfileDto> SearchUsers(string searchTerm, int page = 1, int pageSize = 20)
